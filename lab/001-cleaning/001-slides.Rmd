@@ -1,0 +1,481 @@
+---
+title: "Lab .mono[001]"
+subtitle: "Data cleaning and workflow [2/N]"
+author: "Edward Rubin"
+#date: "`r format(Sys.time(), '%d %B %Y')`"
+date: "15 January 2021"
+output:
+  xaringan::moon_reader:
+    css: ['default', 'metropolis', 'metropolis-fonts', 'my-css.css']
+    # self_contained: true
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      highlightSpans: true
+      countIncrementalSlides: false
+---
+exclude: true
+
+```{R, setup, include = F}
+library(pacman)
+p_load(
+  broom, tidyverse,
+  ggplot2, ggthemes, ggforce, ggridges, cowplot,
+  latex2exp, viridis, extrafont, gridExtra, plotly,
+  kableExtra, snakecase, janitor, DT,
+  data.table, dplyr,
+  lubridate, knitr, future, furrr,
+  estimatr, FNN, caret, parsnip,
+  huxtable, here, magrittr, tidyimpute
+)
+# Define colors
+red_pink   = "#e64173"
+turquoise  = "#20B2AA"
+orange     = "#FFA500"
+red        = "#fb6107"
+blue       = "#3b3b9a"
+green      = "#8bb174"
+grey_light = "grey70"
+grey_mid   = "grey50"
+grey_dark  = "grey20"
+purple     = "#6A5ACD"
+slate      = "#314f4f"
+# Knitr options
+opts_chunk$set(
+  comment = "#>",
+  fig.align = "center",
+  fig.height = 7,
+  fig.width = 10.5,
+  warning = F,
+  message = F
+)
+opts_chunk$set(dev = "svg")
+options(device = function(file, width, height) {
+  svg(tempfile(), width = width, height = height)
+})
+options(knitr.table.format = "html")
+```
+
+---
+layout: true
+# .mono[mutate]
+
+---
+class: inverse, middle
+---
+name: mutate-refresh
+## Refresher
+
+You already know some of .b[`mutate()`]
+
+- .b.pink[Create] new variables
+- .b.blue[Transform] existing data into more usable forms
+- .b.orange[Fill in] missing values
+
+...
+--
+ but it turns out .b[there's more!]
+
+---
+name: pipe-refresh
+## Pipes
+
+But first, a reminder about pipes and the `magrittr` package.
+
+The `%>%` operator is called a .hi[pipe].
+```{r, eval = F}
+# Equivalent:
+some_function(a, b)
+a `%>%` some_function(b)
+```
+
+--
+
+The `%<>%` operator is an .b.purple[assignment pipe]. 
+```{r, eval = F}
+# Equivalent:
+house_df = house_df %>% mutate(n_rooms = bed + bath + other)
+house_df `%<>%` mutate(n_rooms = bed + bath + other)
+```
+
+---
+name: sl-classes
+## 'Regular' .mono[mutate]
+
+--
+
+Transform a numeric variable...
+
+```{r, eval = F}
+# Convert kg to lbs: 1 kg is ~2.205 pounds
+starwars %<>% mutate(weight = mass * 2.205) 
+# Check results
+starwars %>% select(name, mass, weight)
+```
+
+--
+
+```{r, echo = F}
+# Convert kg to lbs: 1 kg is ~2.205 pounds
+starwars %<>% mutate(weight = mass * 2.205) 
+# Check results
+starwars %>% select(name, mass, weight) %>% datatable(rownames = F, options = list(dom = 't', pageLength = 3))
+```
+
+`mutate()` receives data and returns both old and new columns. 
+--
+<br>`transmute()` returns only the new columns.
+
+---
+layout: true
+# .mono[mutate] and family
+---
+class: inverse, middle
+---
+
+name: sl-classes
+## Multiple columns
+
+To `mutate()` multiple variables, you'll want one of its cousins:
+
+- `mutate_at()` applies your function(s) to all .b.pink[specified] columns.
+
+- `mutate_if()` applies your function(s) to .b.orange["matched"] columns.
+
+- `mutate_all()` applies your function(s) to .b.slate[all] columns.
+
+The main difference between the `mutate_*()` functions: 
+> How do you want to select your columns?
+
+.attn[Note:] These `mutate_*()` functions will .b.purple[replace] variables.
+
+---
+layout: true
+
+# .mono[mutate] and family
+## .mono[\_at]
+
+`mutate_at()` wants three arguments:
+
+1. .b.pink[`.tbl`] the dataset you're trying to mutate/transform (*e.g.*, `starwars`)
+1. .b.orange[`.vars`] the specific variables you want to transform (*e.g.*, `mass`)
+1. .b.purple[`.funs`] the function(s) you are using for the transformation (*e.g.*, `log`)
+
+---
+name: mutate-at-intro
+
+--
+
+For example, to take the `log` of `height` and `mass`
+
+```{r, eval = F}
+# Option 1: Character vector of variable names
+starwars %>% mutate_at(.vars = `c("height", "mass")`, .funs = log)
+```
+
+.note[Above:] You can specify .orange[which variables] using a character vector.
+
+--
+
+.attn[Q] Where is .pink[`.tbl`]?
+--
+<br>.attn[A] Implicitly defined as `starwars` via the pipe (`starwars %>%`).
+
+---
+name: mutate-at-fun
+
+For example, take the `log` of `height` and `mass`.
+
+```{r, eval = F}
+# Option 1a: Character vector of variable names
+starwars %>% mutate_at(`.vars` = c("height", "mass"), `.funs` = log)
+# Option 1b: Same, but don't name the arguments
+starwars %>% mutate_at(c("height", "mass"), log)
+```
+
+.note[Above:] You don't have to name the arguments .orange[`.vars`] and .purple[`.funs`].
+
+---
+
+For example, take the `log` of `height` and `mass`.
+
+```{r, eval = F}
+# Option 2a: A "list" via the 'var' function
+starwars %>% mutate_at(.vars = `vars(height, mass)`, .funs = log)
+```
+
+.note[Above:] You can "list" the target variables inside `vars()`.
+
+---
+
+For example, take the `log` of `height` and `mass`.
+
+```{r, eval = F}
+# Option 2b: Variable "span" inside 'var' 
+starwars %>% mutate_at(.vars = `vars`(height`:`mass), .funs = log)
+```
+
+.note[Above:] .orange[.b[Inside] `vars()`], define a "span" of (sequential) variables with `:`.
+
+---
+
+For example, take the `log` of `height`-related variables.
+
+```{r, eval = F}
+# Option 2c: Matching names inside 'var'.
+starwars %>% mutate_at(.vars = vars(`starts_with`("height")), .funs = log)
+```
+
+.note[Above:] .orange[.b[Inside] `vars()`], variables whose names start with `"height"`.
+
+--
+
+"Predicate" functions: `starts_with`, `ends_with`, `contains`, `matches`.
+
+---
+layout: true
+
+# .mono[mutate] and family
+## .mono[\_at]
+
+---
+name: mutate-at-ex
+
+.attn[Q] How might we use `mutate_at` to help with missing values?
+
+.note[Ex.] C-3PO and R2-D2 (among others) have `NA` for `hair_color`
+--
+,<br>but let's apply our technique for .b.orange[all `"_color"` variables].
+
+--
+
+We need two things:
+
+.note[1\.] Which .b.orange[`.vars`] we will target.
+--
+```{r, eval = F}
+.vars = vars(contains("_color"))
+```
+
+--
+
+.note[2\.] The .b.purple[function(s)] (.purple[`.funs`]) for the mutation/transformation.
+```{r}
+# We'll write our own function but can rely upon 'replace_na'
+na_to_other = function(d) replace_na(data = d, replace = "other")
+```
+
+---
+
+The function `replace_na(data, replace)` comes from [`tidyr`](https://tidyr.tidyverse.org/reference/replace_na.html).
+
+- .b.turquoise[`data`] can be a vector or data frame
+
+- .b.slate[`replace`] is the replacement for those pesky `NA`s
+
+.attn[Be careful:] Just because you .it[can] replace `NA`s doesn't mean you .it[should].
+
+---
+Let's put it all together now.
+
+```{r, eval = F}
+# Define the function to replace NAs with "other"
+na_to_other = function(d) replace_na(data = d, replace = "other")
+# Use mutate_at to transform "_color" variables
+starwars %<>% mutate_at(
+  .vars = vars(contains("_color")),
+  .funs = na_to_other
+)
+# Check if it worked!
+starwars %>% select(name, contains("_color"))
+```
+
+```{r, echo = F}
+# Define the function to replace NAs with "other"
+na_to_other = function(d) replace_na(data = d, replace = "other")
+# Use mutate_at to transform "_color" variables
+starwars %<>% mutate_at(
+  .vars = vars(contains("_color")),
+  .funs = na_to_other
+)
+# Check if it worked!
+starwars %>% select(name, contains("_color")) %>% datatable(rownames = F, options = list(dom = 't', pageLength = 3))
+```
+
+---
+
+.note[Note:] We don't actually have to define our own function.
+
+`replace_na()` just wants to know what should `replace` the `NA`s.
+
+
+```{r, eval = F}
+# Use mutate_at to transform "_color" variables
+starwars %<>% mutate_at(
+  .vars = vars(contains("_color")),
+  .funs = `replace_na`, 
+  `replace = "other"`
+)
+```
+
+```{r, echo = F}
+# Use mutate_at to transform "_color" variables
+tmp = dplyr::starwars %>% mutate_at(
+  .vars = vars(contains("_color")),
+  .funs = replace_na, 
+  replace = "other"
+)
+# Check if it worked!
+tmp %>% select(name, contains("_color")) %>% datatable(rownames = F, options = list(dom = 't', pageLength = 3))
+```
+
+---
+layout: false
+name: mutate-if-intro
+# .mono[mutate] and family
+## .mono[\_if]
+
+`mutate`.neg-left.b.pink[`_if`] is very similar to `mutate`.neg-left.b.orange[`_at`]. 
+
+- .b.pink[`_if`] uses .pink[logical statements] to select columns.
+
+- .note[Recall:] .b.orange[`_at`] uses .orange[more direct statements] to select columns.
+
+---
+layout: true
+# .mono[mutate] and family
+## .mono[\_if]
+
+`mutate_if()` wants three arguments:
+
+1. .b.pink[`.tbl`] the dataset you're trying to mutate/transform (*e.g.*, `starwars`)
+1. .b.orange[`.predicate`] logical statement to select variables (*e.g.*, `is_character`)
+1. .b.purple[`.funs`] function(s) for the transformation (*e.g.*, `replace_na`)
+
+---
+name: mutate-if-fun
+
+For example, let's .purple[change `NA`s to `"other"`] for .orange[all `character` variables].
+
+```{r, eval = F}
+# Replace NAs with "other" for character variables
+starwars %>% mutate_if(
+  .predicate = `is.character`,
+  .funs = replace_na, replace = "other"
+)
+```
+
+.note[Above:] .mono[R] finds all `character` variables and runs `replace_na` on them.
+
+---
+layout: false
+name: mutate-if-ex
+# .mono[mutate] and family
+## .mono[\_if]
+
+Let's .purple[change `NA`s to variables' means] for .orange[`numeric` variables].
+
+.b.slate[Step 1] Create a function that replaces `NA`s with the mean:
+```{r, eval = F}
+# Function for mean imputation/replacement
+mean_replace = function(d) replace_na(d, replace = mean(d, `na.rm = T`))
+```
+.note[Notice:] We need `na.rm = T` in `mean()` to calculate the mean when `NA`s exist.
+
+--
+
+.b.slate[Step 2] Use the new function `mean_replace()` with `mutate_if()`:
+```{r, eval = F}
+# Replace NAs with means for numeric variables
+starwars %>% mutate_if(
+  .predicate = is.numeric,
+  .funs = mean_replace
+)
+```
+
+---
+layout: false
+class: clear, middle 
+
+What if we want to apply a function to .b.slate[all] of our columns?
+
+---
+layout: true
+# .mono[mutate] and family
+## .mono[\_all]
+
+---
+name: mutate-all-intro
+
+`mutate_all(`.neg-left.b.pink[`.tbl`].neg-left[`,`].neg-left.b.purple[`.funs`].neg-left[`)`] does exactly what its name suggests. 
+
+--
+
+You supply the data (.b.pink[`.tbl`]). 
+
+--
+
+`mutate_all()` transforms .b[all] variables in .b.pink[`.tbl`] using .purple[.b[`.funs`] function(s)].
+
+--
+
+Now you just need a function that you want to apply to every variable...
+
+
+---
+layout: false
+# The .mono[dplyr] family
+## There's more!
+
+Just as `mutate` has `mutate_at`, `mutate_if`, and `mutate_all`, 
+
+- `transmute` ⮕ `transmute_at`, `transmute_if`, and `transmute_all`
+- `select` ⮕ `select_at`, `select_if`, and `select_all`
+- `filter` ⮕ `filter_at`, `filter_if`, and `filter_all`
+- `summarize` ⮕ `summarize_at`, `summarize_if`, and `summarize_all`
+- `group_by` ⮕ `group_by_at`, `group_by_if`, and `group_by_all`
+
+--
+
+.note[Note:] `dplyr` is working to replace the "scoped verbs" (`_if`, `_at`, `_all`) with the function [`across()`](https://dplyr.tidyverse.org/reference/across.html). But it's a bit less clean.
+
+---
+# Finishing up
+## What's next?
+
+Check out the .b.slate[wine reviews](https://www.kaggle.com/zynicide/wine-reviews) dataset. It has a lot of opportunities for data cleaning.
+
+.note[Coming soon:]
+- simulation, resampling, and cross validation
+- [`tidymodels`](https://www.tidymodels.org), [`recipes`](https://recipes.tidymodels.org/index.html) (more [here](https://www.tidymodels.org/start/recipes/#recipe)), and [`parsnip`](https://parsnip.tidymodels.org/articles/parsnip_Intro.html)
+- .it[Related:] [tidy modeling with .mono[R]](https://www.tmwr.org/models.html)
+
+---
+
+layout: false
+# Table of contents
+
+.col-left.small[
+
+#### .mono[mutate]
+- [Refresher](#mutate-refresh)
+- [Pipes](#pipe-refresh)
+
+#### .mono[mutate_at]
+- [Intro](#mutate-at-intro)
+- [Fundamentals](#mutate-at-fun)
+- [Example](#mutate-at-ex)
+
+]
+
+.col-right.small[
+
+#### .mono[mutate_if]
+- [Intro](#mutate-if-intro)
+- [Fundamentals](#mutate-if-fun)
+- [Example](#mutate-if-ex)
+
+#### .mono[mutate_all]
+- [Intro](#mutate-all-intro)
+
+]

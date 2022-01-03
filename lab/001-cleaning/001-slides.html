@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Lab .mono[001]</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Edward Rubin" />
+    <meta name="date" content="2021-01-15" />
+    <link href="001-slides_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="001-slides_files/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="001-slides_files/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <script src="001-slides_files/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+    <script src="001-slides_files/jquery-1.12.4/jquery.min.js"></script>
+    <link href="001-slides_files/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+    <script src="001-slides_files/datatables-binding-0.8/datatables.js"></script>
+    <link href="001-slides_files/dt-core-1.10.16/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="001-slides_files/dt-core-1.10.16/css/jquery.dataTables.extra.css" rel="stylesheet" />
+    <script src="001-slides_files/dt-core-1.10.16/js/jquery.dataTables.min.js"></script>
+    <link href="001-slides_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+    <script src="001-slides_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+    <link rel="stylesheet" href="my-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Lab .mono[001]
+## Data cleaning and workflow [2/N]
+### Edward Rubin
+### 15 January 2021
+
+---
+
+exclude: true
+
+
+
+---
+layout: true
+# .mono[mutate]
+
+---
+class: inverse, middle
+---
+name: mutate-refresh
+## Refresher
+
+You already know some of .b[`mutate()`]
+
+- .b.pink[Create] new variables
+- .b.blue[Transform] existing data into more usable forms
+- .b.orange[Fill in] missing values
+
+...
+--
+ but it turns out .b[there's more!]
+
+---
+name: pipe-refresh
+## Pipes
+
+But first, a reminder about pipes and the `magrittr` package.
+
+The `%&gt;%` operator is called a .hi[pipe].
+
+```r
+# Equivalent:
+some_function(a, b)
+a `%&gt;%` some_function(b)
+```
+
+--
+
+The `%&lt;&gt;%` operator is an .b.purple[assignment pipe]. 
+
+```r
+# Equivalent:
+house_df = house_df %&gt;% mutate(n_rooms = bed + bath + other)
+house_df `%&lt;&gt;%` mutate(n_rooms = bed + bath + other)
+```
+
+---
+name: sl-classes
+## 'Regular' .mono[mutate]
+
+--
+
+Transform a numeric variable...
+
+
+```r
+# Convert kg to lbs: 1 kg is ~2.205 pounds
+starwars %&lt;&gt;% mutate(weight = mass * 2.205) 
+# Check results
+starwars %&gt;% select(name, mass, weight)
+```
+
+--
+
+<div id="htmlwidget-905bc07e5ab0c9542de8" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-905bc07e5ab0c9542de8">{"x":{"filter":"none","data":[["Luke Skywalker","C-3PO","R2-D2","Darth Vader","Leia Organa","Owen Lars","Beru Whitesun lars","R5-D4","Biggs Darklighter","Obi-Wan Kenobi","Anakin Skywalker","Wilhuff Tarkin","Chewbacca","Han Solo","Greedo","Jabba Desilijic Tiure","Wedge Antilles","Jek Tono Porkins","Yoda","Palpatine","Boba Fett","IG-88","Bossk","Lando Calrissian","Lobot","Ackbar","Mon Mothma","Arvel Crynyd","Wicket Systri Warrick","Nien Nunb","Qui-Gon Jinn","Nute Gunray","Finis Valorum","Jar Jar Binks","Roos Tarpals","Rugor Nass","Ric Olié","Watto","Sebulba","Quarsh Panaka","Shmi Skywalker","Darth Maul","Bib Fortuna","Ayla Secura","Dud Bolt","Gasgano","Ben Quadinaros","Mace Windu","Ki-Adi-Mundi","Kit Fisto","Eeth Koth","Adi Gallia","Saesee Tiin","Yarael Poof","Plo Koon","Mas Amedda","Gregar Typho","Cordé","Cliegg Lars","Poggle the Lesser","Luminara Unduli","Barriss Offee","Dormé","Dooku","Bail Prestor Organa","Jango Fett","Zam Wesell","Dexter Jettster","Lama Su","Taun We","Jocasta Nu","Ratts Tyerell","R4-P17","Wat Tambor","San Hill","Shaak Ti","Grievous","Tarfful","Raymus Antilles","Sly Moore","Tion Medon","Finn","Rey","Poe Dameron","BB8","Captain Phasma","Padmé Amidala"],[77,75,32,136,49,120,75,32,84,77,84,null,112,80,74,1358,77,110,17,75,78.2,140,113,79,79,83,null,null,20,68,89,90,null,66,82,null,null,null,40,null,null,80,null,55,45,null,65,84,82,87,null,50,null,null,80,null,85,null,null,80,56.2,50,null,80,null,79,55,102,88,null,null,15,null,48,null,57,159,136,79,48,80,null,null,null,null,null,45],[169.785,165.375,70.56,299.88,108.045,264.6,165.375,70.56,185.22,169.785,185.22,null,246.96,176.4,163.17,2994.39,169.785,242.55,37.485,165.375,172.431,308.7,249.165,174.195,174.195,183.015,null,null,44.1,149.94,196.245,198.45,null,145.53,180.81,null,null,null,88.2,null,null,176.4,null,121.275,99.225,null,143.325,185.22,180.81,191.835,null,110.25,null,null,176.4,null,187.425,null,null,176.4,123.921,110.25,null,176.4,null,174.195,121.275,224.91,194.04,null,null,33.075,null,105.84,null,125.685,350.595,299.88,174.195,105.84,176.4,null,null,null,null,null,99.225]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>name<\/th>\n      <th>mass<\/th>\n      <th>weight<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","pageLength":3,"columnDefs":[{"className":"dt-right","targets":[1,2]}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[3,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+
+`mutate()` receives data and returns both old and new columns. 
+--
+&lt;br&gt;`transmute()` returns only the new columns.
+
+---
+layout: true
+# .mono[mutate] and family
+---
+class: inverse, middle
+---
+
+name: sl-classes
+## Multiple columns
+
+To `mutate()` multiple variables, you'll want one of its cousins:
+
+- `mutate_at()` applies your function(s) to all .b.pink[specified] columns.
+
+- `mutate_if()` applies your function(s) to .b.orange["matched"] columns.
+
+- `mutate_all()` applies your function(s) to .b.slate[all] columns.
+
+The main difference between the `mutate_*()` functions: 
+&gt; How do you want to select your columns?
+
+.attn[Note:] These `mutate_*()` functions will .b.purple[replace] variables.
+
+---
+layout: true
+
+# .mono[mutate] and family
+## .mono[\_at]
+
+`mutate_at()` wants three arguments:
+
+1. .b.pink[`.tbl`] the dataset you're trying to mutate/transform (*e.g.*, `starwars`)
+1. .b.orange[`.vars`] the specific variables you want to transform (*e.g.*, `mass`)
+1. .b.purple[`.funs`] the function(s) you are using for the transformation (*e.g.*, `log`)
+
+---
+name: mutate-at-intro
+
+--
+
+For example, to take the `log` of `height` and `mass`
+
+
+```r
+# Option 1: Character vector of variable names
+starwars %&gt;% mutate_at(.vars = `c("height", "mass")`, .funs = log)
+```
+
+.note[Above:] You can specify .orange[which variables] using a character vector.
+
+--
+
+.attn[Q] Where is .pink[`.tbl`]?
+--
+&lt;br&gt;.attn[A] Implicitly defined as `starwars` via the pipe (`starwars %&gt;%`).
+
+---
+name: mutate-at-fun
+
+For example, take the `log` of `height` and `mass`.
+
+
+```r
+# Option 1a: Character vector of variable names
+starwars %&gt;% mutate_at(`.vars` = c("height", "mass"), `.funs` = log)
+# Option 1b: Same, but don't name the arguments
+starwars %&gt;% mutate_at(c("height", "mass"), log)
+```
+
+.note[Above:] You don't have to name the arguments .orange[`.vars`] and .purple[`.funs`].
+
+---
+
+For example, take the `log` of `height` and `mass`.
+
+
+```r
+# Option 2a: A "list" via the 'var' function
+starwars %&gt;% mutate_at(.vars = `vars(height, mass)`, .funs = log)
+```
+
+.note[Above:] You can "list" the target variables inside `vars()`.
+
+---
+
+For example, take the `log` of `height` and `mass`.
+
+
+```r
+# Option 2b: Variable "span" inside 'var' 
+starwars %&gt;% mutate_at(.vars = `vars`(height`:`mass), .funs = log)
+```
+
+.note[Above:] .orange[.b[Inside] `vars()`], define a "span" of (sequential) variables with `:`.
+
+---
+
+For example, take the `log` of `height`-related variables.
+
+
+```r
+# Option 2c: Matching names inside 'var'.
+starwars %&gt;% mutate_at(.vars = vars(`starts_with`("height")), .funs = log)
+```
+
+.note[Above:] .orange[.b[Inside] `vars()`], variables whose names start with `"height"`.
+
+--
+
+"Predicate" functions: `starts_with`, `ends_with`, `contains`, `matches`.
+
+---
+layout: true
+
+# .mono[mutate] and family
+## .mono[\_at]
+
+---
+name: mutate-at-ex
+
+.attn[Q] How might we use `mutate_at` to help with missing values?
+
+.note[Ex.] C-3PO and R2-D2 (among others) have `NA` for `hair_color`
+--
+,&lt;br&gt;but let's apply our technique for .b.orange[all `"_color"` variables].
+
+--
+
+We need two things:
+
+.note[1\.] Which .b.orange[`.vars`] we will target.
+--
+
+```r
+.vars = vars(contains("_color"))
+```
+
+--
+
+.note[2\.] The .b.purple[function(s)] (.purple[`.funs`]) for the mutation/transformation.
+
+```r
+# We'll write our own function but can rely upon 'replace_na'
+na_to_other = function(d) replace_na(data = d, replace = "other")
+```
+
+---
+
+The function `replace_na(data, replace)` comes from [`tidyr`](https://tidyr.tidyverse.org/reference/replace_na.html).
+
+- .b.turquoise[`data`] can be a vector or data frame
+
+- .b.slate[`replace`] is the replacement for those pesky `NA`s
+
+.attn[Be careful:] Just because you .it[can] replace `NA`s doesn't mean you .it[should].
+
+---
+Let's put it all together now.
+
+
+```r
+# Define the function to replace NAs with "other"
+na_to_other = function(d) replace_na(data = d, replace = "other")
+# Use mutate_at to transform "_color" variables
+starwars %&lt;&gt;% mutate_at(
+  .vars = vars(contains("_color")),
+  .funs = na_to_other
+)
+# Check if it worked!
+starwars %&gt;% select(name, contains("_color"))
+```
+
+<div id="htmlwidget-5a68643eb1653bd18ca7" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5a68643eb1653bd18ca7">{"x":{"filter":"none","data":[["Luke Skywalker","C-3PO","R2-D2","Darth Vader","Leia Organa","Owen Lars","Beru Whitesun lars","R5-D4","Biggs Darklighter","Obi-Wan Kenobi","Anakin Skywalker","Wilhuff Tarkin","Chewbacca","Han Solo","Greedo","Jabba Desilijic Tiure","Wedge Antilles","Jek Tono Porkins","Yoda","Palpatine","Boba Fett","IG-88","Bossk","Lando Calrissian","Lobot","Ackbar","Mon Mothma","Arvel Crynyd","Wicket Systri Warrick","Nien Nunb","Qui-Gon Jinn","Nute Gunray","Finis Valorum","Jar Jar Binks","Roos Tarpals","Rugor Nass","Ric Olié","Watto","Sebulba","Quarsh Panaka","Shmi Skywalker","Darth Maul","Bib Fortuna","Ayla Secura","Dud Bolt","Gasgano","Ben Quadinaros","Mace Windu","Ki-Adi-Mundi","Kit Fisto","Eeth Koth","Adi Gallia","Saesee Tiin","Yarael Poof","Plo Koon","Mas Amedda","Gregar Typho","Cordé","Cliegg Lars","Poggle the Lesser","Luminara Unduli","Barriss Offee","Dormé","Dooku","Bail Prestor Organa","Jango Fett","Zam Wesell","Dexter Jettster","Lama Su","Taun We","Jocasta Nu","Ratts Tyerell","R4-P17","Wat Tambor","San Hill","Shaak Ti","Grievous","Tarfful","Raymus Antilles","Sly Moore","Tion Medon","Finn","Rey","Poe Dameron","BB8","Captain Phasma","Padmé Amidala"],["blond","other","other","none","brown","brown, grey","brown","other","black","auburn, white","blond","auburn, grey","brown","brown","other","other","brown","brown","white","grey","black","none","none","black","none","none","auburn","brown","brown","none","brown","none","blond","none","none","none","brown","black","none","black","black","none","none","none","none","none","none","none","white","none","black","none","none","none","none","none","black","brown","brown","none","black","black","brown","white","black","black","blonde","none","none","none","white","none","none","none","none","none","none","brown","brown","none","none","black","brown","brown","none","unknown","brown"],["fair","gold","white, blue","white","light","light","light","white, red","light","fair","fair","fair","unknown","fair","green","green-tan, brown","fair","fair","green","pale","fair","metal","green","dark","light","brown mottle","fair","fair","brown","grey","fair","mottled green","fair","orange","grey","green","fair","blue, grey","grey, red","dark","fair","red","pale","blue","blue, grey","white, blue","grey, green, yellow","dark","pale","green","brown","dark","pale","white","orange","blue","dark","light","fair","green","yellow","yellow","light","fair","tan","tan","fair, green, yellow","brown","grey","grey","fair","grey, blue","silver, red","green, grey","grey","red, blue, white","brown, white","brown","light","pale","grey","dark","light","light","none","unknown","light"],["blue","yellow","red","yellow","brown","blue","blue","red","brown","blue-gray","blue","blue","blue","brown","black","orange","hazel","blue","brown","yellow","brown","red","red","brown","blue","orange","blue","brown","brown","black","blue","red","blue","orange","orange","orange","blue","yellow","orange","brown","brown","yellow","pink","hazel","yellow","black","orange","brown","yellow","black","brown","blue","orange","yellow","black","blue","brown","brown","blue","yellow","blue","blue","brown","brown","brown","brown","yellow","yellow","black","black","blue","unknown","red, blue","unknown","gold","black","green, yellow","blue","brown","white","black","dark","hazel","brown","black","unknown","brown"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>name<\/th>\n      <th>hair_color<\/th>\n      <th>skin_color<\/th>\n      <th>eye_color<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","pageLength":3,"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[3,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+
+---
+
+.note[Note:] We don't actually have to define our own function.
+
+`replace_na()` just wants to know what should `replace` the `NA`s.
+
+
+
+```r
+# Use mutate_at to transform "_color" variables
+starwars %&lt;&gt;% mutate_at(
+  .vars = vars(contains("_color")),
+  .funs = `replace_na`, 
+  `replace = "other"`
+)
+```
+
+<div id="htmlwidget-39f95b19352934e18570" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-39f95b19352934e18570">{"x":{"filter":"none","data":[["Luke Skywalker","C-3PO","R2-D2","Darth Vader","Leia Organa","Owen Lars","Beru Whitesun lars","R5-D4","Biggs Darklighter","Obi-Wan Kenobi","Anakin Skywalker","Wilhuff Tarkin","Chewbacca","Han Solo","Greedo","Jabba Desilijic Tiure","Wedge Antilles","Jek Tono Porkins","Yoda","Palpatine","Boba Fett","IG-88","Bossk","Lando Calrissian","Lobot","Ackbar","Mon Mothma","Arvel Crynyd","Wicket Systri Warrick","Nien Nunb","Qui-Gon Jinn","Nute Gunray","Finis Valorum","Jar Jar Binks","Roos Tarpals","Rugor Nass","Ric Olié","Watto","Sebulba","Quarsh Panaka","Shmi Skywalker","Darth Maul","Bib Fortuna","Ayla Secura","Dud Bolt","Gasgano","Ben Quadinaros","Mace Windu","Ki-Adi-Mundi","Kit Fisto","Eeth Koth","Adi Gallia","Saesee Tiin","Yarael Poof","Plo Koon","Mas Amedda","Gregar Typho","Cordé","Cliegg Lars","Poggle the Lesser","Luminara Unduli","Barriss Offee","Dormé","Dooku","Bail Prestor Organa","Jango Fett","Zam Wesell","Dexter Jettster","Lama Su","Taun We","Jocasta Nu","Ratts Tyerell","R4-P17","Wat Tambor","San Hill","Shaak Ti","Grievous","Tarfful","Raymus Antilles","Sly Moore","Tion Medon","Finn","Rey","Poe Dameron","BB8","Captain Phasma","Padmé Amidala"],["blond","other","other","none","brown","brown, grey","brown","other","black","auburn, white","blond","auburn, grey","brown","brown","other","other","brown","brown","white","grey","black","none","none","black","none","none","auburn","brown","brown","none","brown","none","blond","none","none","none","brown","black","none","black","black","none","none","none","none","none","none","none","white","none","black","none","none","none","none","none","black","brown","brown","none","black","black","brown","white","black","black","blonde","none","none","none","white","none","none","none","none","none","none","brown","brown","none","none","black","brown","brown","none","unknown","brown"],["fair","gold","white, blue","white","light","light","light","white, red","light","fair","fair","fair","unknown","fair","green","green-tan, brown","fair","fair","green","pale","fair","metal","green","dark","light","brown mottle","fair","fair","brown","grey","fair","mottled green","fair","orange","grey","green","fair","blue, grey","grey, red","dark","fair","red","pale","blue","blue, grey","white, blue","grey, green, yellow","dark","pale","green","brown","dark","pale","white","orange","blue","dark","light","fair","green","yellow","yellow","light","fair","tan","tan","fair, green, yellow","brown","grey","grey","fair","grey, blue","silver, red","green, grey","grey","red, blue, white","brown, white","brown","light","pale","grey","dark","light","light","none","unknown","light"],["blue","yellow","red","yellow","brown","blue","blue","red","brown","blue-gray","blue","blue","blue","brown","black","orange","hazel","blue","brown","yellow","brown","red","red","brown","blue","orange","blue","brown","brown","black","blue","red","blue","orange","orange","orange","blue","yellow","orange","brown","brown","yellow","pink","hazel","yellow","black","orange","brown","yellow","black","brown","blue","orange","yellow","black","blue","brown","brown","blue","yellow","blue","blue","brown","brown","brown","brown","yellow","yellow","black","black","blue","unknown","red, blue","unknown","gold","black","green, yellow","blue","brown","white","black","dark","hazel","brown","black","unknown","brown"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>name<\/th>\n      <th>hair_color<\/th>\n      <th>skin_color<\/th>\n      <th>eye_color<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","pageLength":3,"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[3,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+
+---
+layout: false
+name: mutate-if-intro
+# .mono[mutate] and family
+## .mono[\_if]
+
+`mutate`.neg-left.b.pink[`_if`] is very similar to `mutate`.neg-left.b.orange[`_at`]. 
+
+- .b.pink[`_if`] uses .pink[logical statements] to select columns.
+
+- .note[Recall:] .b.orange[`_at`] uses .orange[more direct statements] to select columns.
+
+---
+layout: true
+# .mono[mutate] and family
+## .mono[\_if]
+
+`mutate_if()` wants three arguments:
+
+1. .b.pink[`.tbl`] the dataset you're trying to mutate/transform (*e.g.*, `starwars`)
+1. .b.orange[`.predicate`] logical statement to select variables (*e.g.*, `is_character`)
+1. .b.purple[`.funs`] function(s) for the transformation (*e.g.*, `replace_na`)
+
+---
+name: mutate-if-fun
+
+For example, let's .purple[change `NA`s to `"other"`] for .orange[all `character` variables].
+
+
+```r
+# Replace NAs with "other" for character variables
+starwars %&gt;% mutate_if(
+  .predicate = `is.character`,
+  .funs = replace_na, replace = "other"
+)
+```
+
+.note[Above:] .mono[R] finds all `character` variables and runs `replace_na` on them.
+
+---
+layout: false
+name: mutate-if-ex
+# .mono[mutate] and family
+## .mono[\_if]
+
+Let's .purple[change `NA`s to variables' means] for .orange[`numeric` variables].
+
+.b.slate[Step 1] Create a function that replaces `NA`s with the mean:
+
+```r
+# Function for mean imputation/replacement
+mean_replace = function(d) replace_na(d, replace = mean(d, `na.rm = T`))
+```
+.note[Notice:] We need `na.rm = T` in `mean()` to calculate the mean when `NA`s exist.
+
+--
+
+.b.slate[Step 2] Use the new function `mean_replace()` with `mutate_if()`:
+
+```r
+# Replace NAs with means for numeric variables
+starwars %&gt;% mutate_if(
+  .predicate = is.numeric,
+  .funs = mean_replace
+)
+```
+
+---
+layout: false
+class: clear, middle 
+
+What if we want to apply a function to .b.slate[all] of our columns?
+
+---
+layout: true
+# .mono[mutate] and family
+## .mono[\_all]
+
+---
+name: mutate-all-intro
+
+`mutate_all(`.neg-left.b.pink[`.tbl`].neg-left[`,`].neg-left.b.purple[`.funs`].neg-left[`)`] does exactly what its name suggests. 
+
+--
+
+You supply the data (.b.pink[`.tbl`]). 
+
+--
+
+`mutate_all()` transforms .b[all] variables in .b.pink[`.tbl`] using .purple[.b[`.funs`] function(s)].
+
+--
+
+Now you just need a function that you want to apply to every variable...
+
+
+---
+layout: false
+# The .mono[dplyr] family
+## There's more!
+
+Just as `mutate` has `mutate_at`, `mutate_if`, and `mutate_all`, 
+
+- `transmute` ⮕ `transmute_at`, `transmute_if`, and `transmute_all`
+- `select` ⮕ `select_at`, `select_if`, and `select_all`
+- `filter` ⮕ `filter_at`, `filter_if`, and `filter_all`
+- `summarize` ⮕ `summarize_at`, `summarize_if`, and `summarize_all`
+- `group_by` ⮕ `group_by_at`, `group_by_if`, and `group_by_all`
+
+--
+
+.note[Note:] `dplyr` is working to replace the "scoped verbs" (`_if`, `_at`, `_all`) with the function [`across()`](https://dplyr.tidyverse.org/reference/across.html). But it's a bit less clean.
+
+---
+# Finishing up
+## What's next?
+
+Check out the .b.slate[wine reviews](https://www.kaggle.com/zynicide/wine-reviews) dataset. It has a lot of opportunities for data cleaning.
+
+.note[Coming soon:]
+- simulation, resampling, and cross validation
+- [`tidymodels`](https://www.tidymodels.org), [`recipes`](https://recipes.tidymodels.org/index.html) (more [here](https://www.tidymodels.org/start/recipes/#recipe)), and [`parsnip`](https://parsnip.tidymodels.org/articles/parsnip_Intro.html)
+- .it[Related:] [tidy modeling with .mono[R]](https://www.tmwr.org/models.html)
+
+---
+
+layout: false
+# Table of contents
+
+.col-left.small[
+
+#### .mono[mutate]
+- [Refresher](#mutate-refresh)
+- [Pipes](#pipe-refresh)
+
+#### .mono[mutate_at]
+- [Intro](#mutate-at-intro)
+- [Fundamentals](#mutate-at-fun)
+- [Example](#mutate-at-ex)
+
+]
+
+.col-right.small[
+
+#### .mono[mutate_if]
+- [Intro](#mutate-if-intro)
+- [Fundamentals](#mutate-if-fun)
+- [Example](#mutate-if-ex)
+
+#### .mono[mutate_all]
+- [Intro](#mutate-all-intro)
+
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"highlightSpans": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
