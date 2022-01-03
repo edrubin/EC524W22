@@ -54,7 +54,7 @@ options(device = function(file, width, height) {
 })
 options(knitr.table.format = "html")
 # A few extras
-xaringanExtra::use_xaringan_extra(c("tile_view"))
+xaringanExtra::use_xaringan_extra(c("tile_view", "fit_screen"))
 ```
 
 ---
@@ -67,17 +67,17 @@ name: admin
 
 .hi-slate[In-class today]
 
-- .b[Course website:] [https://github.com/edrubin/EC524W22/](https://github.com/edrubin/EC524W22/)
+- .note[Course website:] [https://github.com/edrubin/EC524W22/](https://github.com/edrubin/EC524W22/)
 - [Syllabus](https://raw.githack.com/edrubin/EC524W22/master/syllabus/syllabus.pdf) (on website)
 - In person?
 
 .hi-slate[.mono[TODO] list]
 
-- .b[Today:] Sign up for [Kaggle](https://www.kaggle.com)
+- .note[Today:] Sign up for [Kaggle](https://www.kaggle.com)
 - Upcoming readings:
   - ISL Ch1–Ch2
   - [Prediction Policy Problems](https://www.aeaweb.org/articles?id=10.1257/aer.p20151023) by Kleinberg .it[et al.] (2015)
-- .b[Assignment:] This week (get to know prediction and Kaggle)
+- .note[Assignment:] This week (get to know prediction and Kaggle)
 
 ---
 class: inverse, middle

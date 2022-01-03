@@ -3,7 +3,7 @@ title: "Lecture .mono[001]"
 subtitle: "Statistical learning: Foundations"
 author: "Edward Rubin"
 #date: "`r format(Sys.time(), '%d %B %Y')`"
-date: "05 January 2021"
+date: "January 2022"
 output:
   xaringan::moon_reader:
     css: ['default', 'metropolis', 'metropolis-fonts', 'my-css.css']
@@ -15,7 +15,7 @@ output:
 ---
 exclude: true
 
-```{R, setup, include = F}
+```{r, setup, include = F}
 library(pacman)
 p_load(
   broom, tidyverse,
@@ -53,30 +53,35 @@ options(device = function(file, width, height) {
   svg(tempfile(), width = width, height = height)
 })
 options(knitr.table.format = "html")
+# A few extras
+xaringanExtra::use_xaringan_extra(c("tile_view", "fit_screen"))
 ```
+
 ---
 layout: true
 # Admin
 
 ---
 class: inverse, middle
+
 ---
 name: admin-today
 ## Today
 
 .hi-slate[In-class]
 
-- .note[Course website:] [https://github.com/edrubin/EC524W21/](https://github.com/edrubin/EC524W21/)
+- .note[Course website:] [https://github.com/edrubin/EC524W22/](https://github.com/edrubin/EC524W22/)
 - .note[Resources]
   - [RStudio](https://education.rstudio.com/learn/) cheatsheets, books, and tutorials
   - [UO library](http://uoregon.libcal.com/calendar/dataservices/?cid=11979&t=g&d=0000-00-00&cal=11979,11173)
   - See course page for more...
 - Formalizing statistical learning, notation, goals (and problems)
+
 ---
 layout: false
 class: clear, middle
 
-```{R, eugene r, echo = F}
+```{r, eugene r, echo = F}
 knitr::include_graphics("images/eugene-r.png")
 ```
 .smaller[[Tweet](https://twitter.com/ryann_crowley/status/1216880767072002048); [h/t: Grant McDermott](https://grantmcdermott.com/)]
@@ -90,18 +95,20 @@ name: admin-soon
 .hi-slate[Readings]
 
 - .note[Today]
-  - .it[ISL] Ch1–Ch2
+  - .it[ISL] Ch. 1–2
   - [Prediction Policy Problems](https://www.aeaweb.org/articles?id=10.1257/aer.p20151023) by Kleinberg .it[et al.] (2015)
 - .note[Next]
   - .it[ISL] Ch. 3–4
 
 .hi-slate[Problem set] Soon.
+
 ---
 layout: true
 # Statistical learning
 
 ---
 class: inverse, middle
+
 ---
 name: sl-definition
 ## What is it?
@@ -155,10 +162,11 @@ layout: false
 class: clear, middle
 
 .hi-slate[Semi-supervised learning] falls somewhere between these supervised and unsupervised learning—generally applied to supervised tasks when labeled .hi-orange[outputs] are incomplete.
+
 ---
 class: clear, middle
 
-```{R, comic, echo = F}
+```{r, comic, echo = F}
 knitr::include_graphics("images/comic-learning.jpg")
 ```
 
@@ -284,6 +292,7 @@ Applied to .mono[R]:
 - `dim(x_df)` = $\color{#e64173}{n}$ $\color{#6A5ACD}{p}$
 - `nrow(x_df)` $= \color{#e64173}{n}$; `ncol(x_df)` $= \color{#6A5ACD}{p}$
 - `x_df[1,]` $\left( \color{#e64173}{i = 1} \right)$; `x_df[,1]` $\left( \color{#6A5ACD}{j = 1} \right)$
+
 ---
 name: notation-outcomes
 ## Outcomes
@@ -311,11 +320,13 @@ $$
 --
 
 and our full dataset is composed of $\bigg\{ \left( x_{\color{#e64173}{1}},\color{#FFA500}{y}_{\color{#e64173}{1}} \right),\, \left( x_{\color{#e64173}{2}},\color{#FFA500}{y}_{\color{#e64173}{2}} \right),\, \ldots,\, \left( x_{\color{#e64173}{n}},\color{#FFA500}{y}_{\color{#e64173}{n}} \right) \bigg\}$.
+
 ---
 layout: false
 class: clear, middle
 
 Back to the problem of (supervised) statistical learning...
+
 ---
 layout: true
 # Statistical learning
@@ -391,6 +402,7 @@ our *black-box setting* where we care less about $\color{#20B2AA}{f}$ than $\hat
 --
 
 Similarly, in causal-inference settings, we don't particulary care about $\hat{\color{#FFA500}{\mathbf{y}}}$.
+
 ---
 name: sl-prediction
 ## Prediction errors
@@ -469,6 +481,7 @@ Methods' parametric assumptions come with tradeoffs.
 .hi-slate[Non-parametric methods]
 <br> .pink.mono[+] Fewer assumptions. More flexibility.
 <br> .purple.mono[-] Lower interpretability. Susceptible to overfitting. Want lots of data.
+
 ---
 layout: true
 class: clear, middle
@@ -476,10 +489,11 @@ class: clear, middle
 ---
 
 .hi-slate[Example:] Let's start with a pretty funky, nonlinear function.
+
 ---
 exclude: true
 
-```{R, ex data, cache = T}
+```{r, ex data, cache = T}
 # Sample size
 n = 70
 # Set seed
@@ -551,7 +565,7 @@ range_error = c(
 name: ex-truth
 
 .hi-slate[Truth:] The (nonlinear) $f(\mathbf{X})$ that we hope to recover.
-```{R, ex truth, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
+```{r, ex truth, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
 # True 'f(X)' (surface)
 plot_ly(
   x = unique(truth_df$x1),
@@ -570,7 +584,7 @@ layout(scene = list(
 
 ---
 .hi-slate[The sample:] $n=70$ randomly drawn observations for $\mathbf{y} = f(\mathbf{x}_1,\, \mathbf{x}_2) + \varepsilon$
-```{R, ex sample, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
+```{r, ex sample, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
 # Sample observations (3d scatter)
 plot_ly(
   type = "scatter3d",
@@ -592,7 +606,7 @@ layout(scene = list(
 name: ex-lm
 
 .hi-slate[Estimated linear-regression model:] $\hat{\mathbf{y}} = \hat\beta_0 + \hat\beta_1 \mathbf{x}_1 + \hat\beta_2 \mathbf{x}_2 + \hat\beta_3 \mathbf{x}_1 \mathbf{x}_2$
-```{R, ex lm, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
+```{r, ex lm, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
 # Linear regression estimate (surface)
 plot_ly(
   x = unique(truth_df$x1),
@@ -611,7 +625,7 @@ layout(scene = list(
 
 ---
 .hi-slate[Prediction error] from our fitted linear regression model
-```{R, ex lm errors, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
+```{r, ex lm errors, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
 # Regression error (3d scatter)
 plot_ly(
   type = "scatter3d",
@@ -633,7 +647,7 @@ layout(scene = list(
 name: ex-knn
 
 .hi-slate[k-nearest neighbors] (kNN) using k=5 .grey-light[(a *non-parametric* method)]
-```{R, ex knn5, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
+```{r, ex knn5, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
 # knn model (k = 5) (surface)
 plot_ly(
   x = unique(truth_df$x1),
@@ -652,7 +666,7 @@ layout(scene = list(
 
 ---
 .hi-slate[k-nearest neighbors] (kNN) using k=10 .grey-light[(notice increased smoothness)]
-```{R, ex knn10, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
+```{r, ex knn10, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
 # knn model (k = 10) (surface)
 plot_ly(
   x = unique(truth_df$x1),
@@ -668,9 +682,10 @@ layout(scene = list(
   zaxis = list(title = "y", range = range_y)
 )) %>% hide_colorbar()
 ```
+
 ---
 .hi-slate[k-nearest neighbors] (kNN) using k=1 .grey-light[(notice decreased smoothness)]
-```{R, ex knn1, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
+```{r, ex knn1, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
 # knn model (k = 1) (surface)
 plot_ly(
   x = unique(truth_df$x1),
@@ -689,7 +704,7 @@ layout(scene = list(
 
 ---
 .hi-slate[Prediction error] from our fitted kNN (k=5) model
-```{R, ex knn 5 errors, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
+```{r, ex knn 5 errors, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
 # kNN 5 error (3d scatter)
 plot_ly(
   type = "scatter3d",
@@ -709,7 +724,7 @@ layout(scene = list(
 
 ---
 .hi-slate[Prediction error] from our fitted kNN (k=10) model
-```{R, ex knn 10 errors, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
+```{r, ex knn 10 errors, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
 # kNN 10 error (3d scatter)
 plot_ly(
   type = "scatter3d",
@@ -726,9 +741,10 @@ layout(scene = list(
   zaxis = list(title = "error", range = range_error)
 )) %>% colorbar(limits = range_error) %>% hide_colorbar()
 ```
+
 ---
 .hi-slate[Prediction error] from our fitted kNN (k=1) model
-```{R, ex knn 1 errors, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
+```{r, ex knn 1 errors, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
 # kNN 1 error (3d scatter)
 plot_ly(
   type = "scatter3d",
@@ -748,7 +764,7 @@ layout(scene = list(
 
 ---
 .note[Recall] .hi-slate[Prediction error] from our fitted linear regression model
-```{R, ex lm errors again, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
+```{r, ex lm errors again, echo = F, fig.height = 7.5, cache = T, dependson = "ex data"}
 # Regression error (3d scatter)
 plot_ly(
   type = "scatter3d",
@@ -782,6 +798,7 @@ name: accuracy-questions
 1. How could we (better) assess model/predictive performance?
 
 1. Why would we ever want to choose a less flexible model?
+
 ---
 ## Measurement
 
@@ -818,6 +835,7 @@ Defining performance can actually be quite tricky...
 .note[Classification setting, 2] Which is more important?
 1. True positive (*e.g.*, correct diagnosis of cancer)
 1. True negative (*e.g.*, correct diagnosis of "no cancer")
+
 ---
 name: mse
 ## MSE
@@ -838,6 +856,7 @@ Two notes about MSE
 
 1. MSE will be (relatively) very small when .hi-slate[prediction error] is nearly zero.
 1. MSE .hi-slate[penalizes] big errors more than little errors (the squared part).
+
 ---
 name: training-testing
 
@@ -861,11 +880,13 @@ This introduces an important distinction:
 --
 
 .hi-slate[Real goal: Low test-sample MSE] (not the training MSE from before).
+
 ---
 layout: false
 class: clear, middle
 
 .hi-slate[Next time:] model performance, the variance-bias tradeoff, and kNN
+
 ---
 name: sources
 layout: false
@@ -927,7 +948,6 @@ I pulled the comic from [Twitter](https://twitter.com/athena_schools/status/1063
 ---
 exclude: true
 
-```{R, save pdfs, include = F, eval = F}
-# PDF without pauses
-pagedown::chrome_print("001-slides.html", "001-slides.pdf")
+```{r, build pdfs, include = F, eval = F}
+pagedown::chrome_print("001-slides.html", "001-slides.pdf", timeout = 60)
 ```

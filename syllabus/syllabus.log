@@ -1,4 +1,4 @@
-This is LuaTeX, Version 1.07.0 (TeX Live 2018)  (format=lualatex 2018.4.16)  2 JAN 2022 15:37
+This is LuaTeX, Version 1.07.0 (TeX Live 2018)  (format=lualatex 2018.4.16)  3 JAN 2022 09:16
  restricted system commands enabled.
 **syllabus.tex
 (./syllabus.tex
@@ -35,7 +35,7 @@ Inserting `luaotfload.aux.set_capheight' at position 3 in `luaotfload.patch_font
 '.
 Inserting `luaotfload.rewrite_fontname' at position 4 in `luaotfload.patch_font'
 .
-luaotfload | main : initialization completed in 0.130 seconds
+luaotfload | main : initialization completed in 0.103 seconds
 Babel <3.18> and hyphenation patterns for 1 language(s) loaded.
 (/usr/local/texlive/2018/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
@@ -1241,34 +1241,34 @@ LaTeX Font Info:    External font `lmex10' loaded for size
  [1
 
 {/usr/local/texlive/2018/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-Overfull \hbox (9.02176pt too wide) in paragraph at lines 118--119
+Overfull \hbox (9.02176pt too wide) in paragraph at lines 120--121
 []\TU/FiraSans-Book.otf(0)/m/n/10 De-velop []\TU/FiraSans-Book.otf(0)/bx/n/10 f
 a-mil-iar-ity[] \TU/FiraSans-Book.otf(0)/m/n/10 with com-mon machine-learning a
 lgorithms---and their strengths/weak-nesses. 
  []
 
-[2] [3] [4]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 276.
- [5]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 276.
+[2] [3] [4] [5]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 292.
+ [6]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 292.
  (./syllabus.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 276.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 276.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 292.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 292.
 Package rerunfilecheck Info: File `syllabus.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 276.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 292.
 )
 
 Here is how much of LuaTeX's memory you used:
- 22774 strings out of 494413
+ 22777 strings out of 494413
  100000,662416 words of node,token memory allocated
  572 words of node memory still in use:
    6 hlist, 2 vlist, 2 rule, 5 glue, 1 kern, 12 attribute, 63 glue_spec, 12 attr
 ibute_list, 1 write, 2 pdf_action nodes
-   avail lists: 2:563,3:131,4:76,5:541,6:35,7:2842,8:45,9:133,10:5,11:201
+   avail lists: 2:563,3:131,4:76,5:553,6:35,7:2842,8:45,9:140,10:5,11:205
  26217 multiletter control sequences out of 65536+600000
  92 fonts using 17464759 bytes
- 39i,11n,67p,466b,825s stack positions out of 5000i,500n,10000p,200000b,100000s
+ 39i,11n,67p,493b,825s stack positions out of 5000i,500n,10000p,200000b,100000s
 </Users/edwardarubin/Library/Fonts/FiraSans-Italic.otf>{/usr/local/texlive/2018/
 texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/local/texlive/2018/texmf-dist/
 fonts/enc/dvips/lm/lm-rm.enc}{/usr/local/texlive/2018/texmf-dist/fonts/enc/dvips
@@ -1280,10 +1280,10 @@ tf></usr/local/texlive/2018/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></usr/lo
 cal/texlive/2018/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></usr/local/texlive/
 2018/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/texlive/2018/texmf-d
 ist/fonts/type1/public/lm/lmsy10.pfb>
-Output written on syllabus.pdf (5 pages, 69678 bytes).
+Output written on syllabus.pdf (6 pages, 72398 bytes).
 
-PDF statistics: 199 PDF objects out of 1000 (max. 8388607)
- 168 compressed objects within 2 object streams
- 75 named destinations out of 1000 (max. 131072)
+PDF statistics: 205 PDF objects out of 1000 (max. 8388607)
+ 173 compressed objects within 2 object streams
+ 78 named destinations out of 1000 (max. 131072)
  1 words of extra memory for PDF output out of 10000 (max. 100000000)
 
