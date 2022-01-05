@@ -439,8 +439,9 @@ hr, .title-slide h2::after, .mline h1::after {
   height: 1px;
 }
 
-@media print {
+/* @media print {
   .has-continuation {
     display: block !important;
   }
 }
+ */

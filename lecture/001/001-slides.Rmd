@@ -70,12 +70,13 @@ name: admin-today
 
 .hi-slate[In-class]
 
+- .note[Zoom:] [We're on Zoom!](https://uoregon.zoom.us/j/95993008190?pwd=ZW5hV2lhRmF3UFNHU2laSU8vL29Ydz09) See [Canvas](https://canvas.uoregon.edu/courses/196308/pages/zoom-stuff).
 - .note[Course website:] [https://github.com/edrubin/EC524W22/](https://github.com/edrubin/EC524W22/)
 - .note[Resources]
   - [RStudio](https://education.rstudio.com/learn/) cheatsheets, books, and tutorials
   - [UO library](http://uoregon.libcal.com/calendar/dataservices/?cid=11979&t=g&d=0000-00-00&cal=11979,11173)
   - See course page for more...
-- Formalizing statistical learning, notation, goals (and problems)
+- .note[Content:] Formale statistical learning, notation, goals (and problems)
 
 ---
 layout: false
@@ -949,5 +950,5 @@ I pulled the comic from [Twitter](https://twitter.com/athena_schools/status/1063
 exclude: true
 
 ```{r, build pdfs, include = F, eval = F}
-pagedown::chrome_print("001-slides.html", "001-slides.pdf", timeout = 60)
+pagedown::chrome_print("001-slides.html", "001-slides.pdf", wait = 4, timeout = 120)
 ```

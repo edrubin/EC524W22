@@ -128,10 +128,10 @@ So we want "nice"-performing estimates $\hat y$ instead of $\hat\beta$.
 layout: false
 class: clear, middle
 
-Data data be tricky.super[.pink[†]]—as can understanding many relationships.
+Data can be tricky.super[.pink[†]]—as can understanding many relationships.
 
 .footnote[
-.pink[†] "Tricky" might mean nonlinear... or many other things...
+<br>.pink[†] A typo previously had this slide saying "Data data be tricky", which I really like. "Tricky" might mean nonlinear... or many other things...
 ]
 
 
@@ -371,20 +371,24 @@ Sources (articles) of images
 .col-left[
 .small[
 #### Admin
-- [Today and upcoming](#admin)
+- <a href="#admin">Today and upcoming</a>
 
 #### What's the goal?
-- [What's difference?](#different)
-- [Graphical example](#graph-example)
-- [Tradeoffs](#tradeoffs)
-- [More goals](#more-goals)
-- [Examples](#example-articles)
+- <a href="#different">What's different?</a>
+- <a href="#graph-example">Graphical example</a>
+- <a href="#tradeoffs">Tradeoffs</a>
+- <a href="#more-goals">More goals</a>
+- <a href="#example-articles">Examples</a>
 
 #### Other
-- [Image sources](#sources)
+- <a href="#sources">Image sources</a>
 ]
 ]
 
 ```{r, build pdfs, include = F, eval = F}
-xaringanBuilder::build_pdf('000-slides.html')
+xaringanBuilder::build_pdf(
+  input = '000-slides.html',
+  complex_slides = TRUE,
+  partial_slides = TRUE
+)
 ```
