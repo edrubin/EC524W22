@@ -15,7 +15,7 @@ output:
 ---
 exclude: true
 
-```{R, setup, include = F}
+```{r, setup, include = F}
 library(pacman)
 p_load(
   broom, tidyverse,
@@ -56,12 +56,14 @@ options(knitr.table.format = "html")
 # A few extras
 xaringanExtra::use_xaringan_extra(c("tile_view", "fit_screen"))
 ```
+
 ---
 layout: true
 # Admin
 
 ---
 class: inverse, middle
+
 ---
 name: admin-today
 ## Today
@@ -94,6 +96,7 @@ layout: true
 
 ---
 class: inverse, middle
+
 ---
 name: accuracy-review
 ## Review: Supervised learning
@@ -141,6 +144,7 @@ Notice that .b[both functions impose assumptions].
 3. They differ in their assumptions about the .b[magnitude of errors].
   - .b[L1] an additional unit of error is .b[equally bad] everywhere.
   - .b[L2] an additional unit of error is .b[worse] when the error is already big.
+
 ---
 layout: true
 class: clear, middle
@@ -148,7 +152,7 @@ class: clear, middle
 ---
 A very simple, univariate dataset $\left(\mathbf{y},\, \mathbf{x} \right)$
 
-```{R, data loss, echo = F, cache = T}
+```{r, data loss, echo = F, cache = T}
 # Sample size
 n = 30
 # Sample
@@ -164,31 +168,34 @@ loss_gg = ggplot(data = loss_df, aes(x = x, y = y)) +
 theme_void()
 ```
 
-```{R, graph loss 1, echo = F, cache = T, dependson = "data loss"}
+```{r, graph loss 1, echo = F, cache = T, dependson = "data loss"}
 loss_gg +
 geom_point(size = 3.5)
 ```
+
 ---
 ... on which we run a .pink[simple linear regression].
 
-```{R, graph loss 2, echo = F, cache = T, dependson = "data loss"}
+```{r, graph loss 2, echo = F, cache = T, dependson = "data loss"}
 loss_gg +
 geom_smooth(color = red_pink, se = F, method = lm, size = 1.3) +
 geom_point(size = 3.5)
 ```
+
 ---
 Each point $\left( y_i,\, x_i \right)$ has an associated .grey-mid[loss] (error).
 
-```{R, graph loss 3, echo = F, cache = T, dependson = "data loss"}
+```{r, graph loss 3, echo = F, cache = T, dependson = "data loss"}
 loss_gg +
 geom_segment(aes(x = x, xend = x, y = y, yend = y_hat), color = "grey70") +
 geom_smooth(color = red_pink, se = F, method = lm, size = 1.3) +
 geom_point(size = 3.5)
 ```
+
 ---
 The L1 loss function weights all errors equally: $\sum_i \big| y_i - \hat{y}_i \big|$
 
-```{R, graph loss 4, echo = F, cache = T, dependson = "data loss"}
+```{r, graph loss 4, echo = F, cache = T, dependson = "data loss"}
 loss_gg +
 geom_segment(aes(x = x, xend = x, y = y, yend = y_hat, color = abs(loss))) +
 geom_smooth(color = red_pink, se = F, method = lm, size = 1.3) +
@@ -196,10 +203,11 @@ geom_point(size = 3.5) +
 scale_color_viridis_c(option = "magma", end = 0.95) +
 theme(legend.position = "none")
 ```
+
 ---
 The L2 loss function .it[upweights] large weights: $\sum_i \left( y_i - \hat{y}_i \right)^2$
 
-```{R, graph loss 5, echo = F, cache = T, dependson = "data loss"}
+```{r, graph loss 5, echo = F, cache = T, dependson = "data loss"}
 loss_gg +
 geom_segment(aes(x = x, xend = x, y = y, yend = y_hat, color = loss^2)) +
 geom_smooth(color = red_pink, se = F, method = lm, size = 1.3) +
@@ -207,6 +215,7 @@ geom_point(size = 3.5) +
 scale_color_viridis_c(option = "magma", end = 0.95) +
 theme(legend.position = "none")
 ```
+
 ---
 name: overfitting
 layout: false
@@ -224,6 +233,7 @@ We're facing a tradeoff—increasing model flexibility
 --
 
 We can see these tradeoffs in our .hi-pink[test MSE] (but not the .hi-slate[training MSE]).
+
 ---
 class: clear, middle
 layout: true
@@ -231,7 +241,7 @@ layout: true
 ---
 exclude: true
 
-```{R, sim flexibility, echo = F, cache = T, eval = T}
+```{r, sim flexibility, echo = F, cache = T, eval = T}
 # Function to generate our data
 sim_fun = function(x) (x - 3)^2 * (3 * x + 3) * (x + 5) / 100 + 7
 # Generate data
@@ -268,7 +278,7 @@ min_train = flex_df %>% filter(mse_type == "train") %>% filter(mse_value == min(
 min_test = flex_df %>% filter(mse_type == "test") %>% filter(mse_value == min(mse_value))
 ```
 
-```{R, save flexibility simulation, include = F, cache = T, dependson = "sim flexibility"}
+```{r, save flexibility simulation, include = F, cache = T, dependson = "sim flexibility"}
 saveRDS(
   object = flex_df,
   file = here("other-files", "flex-sim.rds")
@@ -280,7 +290,7 @@ name: ex-nonlinear-splines
 
 .hi-slate[Training data] and example models (splines)
 
-```{R, plot data for flexibility, echo = F}
+```{r, plot data for flexibility, echo = F}
 ggplot(data = flex_train %>% as.data.frame(), aes(x, y)) +
 stat_function(
   aes(color = "1", size = "1"), fun = sim_fun, linetype = "longdash"
@@ -325,9 +335,10 @@ theme(
   legend.text = element_text(size = 18)
 )
 ```
+
 ---
 
-```{R, plot flexibility, echo = F}
+```{r, plot flexibility, echo = F}
 ggplot(data = flex_df, aes(x = 1.5 - s, y = mse_value, color = mse_type)) +
 geom_hline(yintercept = 0) +
 geom_vline(xintercept = 0) +
@@ -347,14 +358,16 @@ theme(
   legend.text = element_text(size = 18)
 )
 ```
+
 ---
 The previous example has a pretty nonlinear relationship.
 
 .qa[Q] What happens when truth is actually linear?
+
 ---
 exclude: true
 
-```{R, sim linear flexibility, echo = F, cache = T, eval = T}
+```{r, sim linear flexibility, echo = F, cache = T, eval = T}
 # Function to generate our data
 sim_linear = function(x) 7 + 3 * x
 # Generate data
@@ -390,12 +403,13 @@ lin_df = mclapply(
 min_train_lin = lin_df %>% filter(mse_type == "train") %>% filter(mse_value == min(mse_value))
 min_test_lin = lin_df %>% filter(mse_type == "test") %>% filter(mse_value == min(mse_value))
 ```
+
 ---
 name: ex-linear-splines
 
 .hi-slate[Training data] and example models (splines)
 
-```{R, plot data for linear flexibility, echo = F}
+```{r, plot data for linear flexibility, echo = F}
 ggplot(data = lin_train %>% as.data.frame(), aes(x, y)) +
 stat_function(
   aes(color = "1", size = "1"), fun = sim_linear, linetype = "longdash"
@@ -440,9 +454,10 @@ theme(
   legend.text = element_text(size = 18)
 )
 ```
+
 ---
 
-```{R, plot linear flexibility, echo = F}
+```{r, plot linear flexibility, echo = F}
 ggplot(data = lin_df, aes(x = 1.5 - s, y = mse_value, color = mse_type)) +
 geom_hline(yintercept = 0) +
 geom_vline(xintercept = 0) +
@@ -462,6 +477,7 @@ theme(
   legend.text = element_text(size = 18)
 )
 ```
+
 ---
 layout: true
 # Model accuracy
@@ -490,6 +506,7 @@ Clearly we don't want to overfit our .hi-slate[training data].
  This is an algorithm for .b[overfitting your .hi-pink[test data]].
 
 Okay... so maybe that was on overreaction, but we need to be careful.
+
 ---
 name: bias-variance
 
@@ -507,6 +524,7 @@ This tradeoff that we keep coming back to has an official name:
 .b[Bias] The error that comes from inaccurately estimating $\color{#20B2AA}{f}$.
 - More flexible models are better equipped to recover complex relationships $\left( \color{#20B2AA}{f} \right)$, reducing bias. (Real life is seldom linear.)
 - Simpler (less flexible) models typically increase bias.
+
 ---
 ## The bias-variance tradeoff, formally
 
@@ -536,6 +554,7 @@ $$
 --
 <br>.qa[A.sub[3]] Rates of change for variance and bias will lead to optimal flexibility.
 <br> We often see U-shape curves of .hi-pink[test MSE] w.r.t. to model flexibility.
+
 ---
 layout: false
 class: clear, middle
@@ -543,7 +562,7 @@ class: clear, middle
 .b[U-shaped test MSE] w.r.t. model flexibility
 <br>Increases in variance eventually overcome reductions in (squared) bias.
 
-```{R, plot flexibility again, echo = F, fig.height = 6}
+```{r, plot flexibility again, echo = F, fig.height = 6}
 ggplot(data = flex_df, aes(x = 1.5 - s, y = mse_value, color = mse_type)) +
 geom_hline(yintercept = 0) +
 geom_vline(xintercept = 0) +
@@ -563,6 +582,7 @@ theme(
   legend.text = element_text(size = 18)
 )
 ```
+
 ---
 # Model accuracy
 ## Bias-variance tradeoff
@@ -574,10 +594,12 @@ The bias-variance tradeoff key to understanding many ML concepts.
 
 Spend some time thinking about it and building intution.
 <br>It's time well spent.
+
 ---
 class: clear, middle
 
 So far we've focused on regression problems; what about classification?
+
 ---
 layout: true
 # Model accuracy
@@ -614,13 +636,15 @@ where $\mathbb{I}\!\left( \color{#FFA500}{y}_i \neq \hat{\color{#FFA500}{y}}_i \
 .center[
 Average $\mathbb{I}\!\left( \color{#FFA500}{y}_0 \neq \hat{\color{#FFA500}{y}}_0 \right)$ in our .hi-pink[test data]
 ]
+
 ---
 layout: false
 class: clear
 
-```{R, pic chihuahua, echo = F, out.width = '72%'}
+```{r, pic chihuahua, echo = F, out.width = '72%'}
 include_graphics("images/chihuahua-muffin.jpg")
 ```
+
 ---
 layout: true
 # Model accuracy
@@ -648,6 +672,7 @@ The .b[Bayes classifier] minimizes the .hi-pink[test error rate].
 .footnote[
 .pink[†] The "given" is also read as "conditional on". Think of it as subsetting to where $X=x_0$.
 ]
+
 ---
 ## The Bayes classifier
 
@@ -659,6 +684,7 @@ The .b[Bayes classifier] minimizes the .hi-pink[test error rate].
 - Pr(.orange[y] = "other" | .purple[X] = "orange and purple") = 0.1
 
 Then the Bayes classifier says we should predict "blueberry muffin".
+
 ---
 ## The Bayes classifier
 
@@ -671,10 +697,11 @@ More notes on the Bayes classifier
 1. The Bayes classifier produces the lowest possible .hi-pink[test error rate], which is called the .b[Bayes error rate].
 
 1. Just as with $\color{#20B2AA}{f}$, the probabilities $\mathop{\text{Pr}}\left(\color{#FFA500}{\mathbf{y}}=j|\color{#6A5ACD}{\mathbf{X}}=x_o\right)$ that the Bayes classifier relies upon are .b[unknown]. We have to estimate.
+
 ---
 exclude: true
 
-```{R, gen bayes data, echo = F, cache = T}
+```{r, gen bayes data, echo = F, cache = T}
 # Generate data
 set.seed(1234)
 n_b = 70
@@ -728,13 +755,15 @@ bayes_truth$y_hat2 = as.numeric(est_boundary2$pred > 0.5)
 bayes_truth$y_hat_k1 = as.numeric(est_boundary_k1$pred > 0.5)
 bayes_truth$y_hat_k60 = as.numeric(est_boundary_k60$pred > 0.5)
 ```
+
 ---
 layout: true
 class: clear, middle
+
 ---
 name: ex-bayes
 The .hi-pink[Bayes decision boundary] between classes .orange[A] and .navy[B]
-```{R, plot bayes boundary, echo = F, cache = T, dependson = "gen bayes data"}
+```{r, plot bayes boundary, echo = F, cache = T, dependson = "gen bayes data"}
 ggplot(data = bayes_truth, aes(x1, x2, color = y)) +
 geom_point(shape = 20, size = 0.7) +
 geom_contour(
@@ -745,9 +774,10 @@ scale_color_viridis_c(option = "magma", begin = 0.1, end = 0.85) +
 theme_void() +
 theme(legend.position = "none")
 ```
+
 ---
 Now we sample...
-```{R, plot bayes sample, echo = F, cache = T, dependson = "gen bayes data"}
+```{r, plot bayes sample, echo = F, cache = T, dependson = "gen bayes data"}
 ggplot(data = bayes_truth, aes(x1, x2, color = y)) +
 geom_point(shape = 20, size = 0.5) +
 geom_contour(
@@ -763,9 +793,10 @@ scale_color_viridis_c(option = "magma", begin = 0.1, end = 0.85) +
 theme_void() +
 theme(legend.position = "none")
 ```
+
 ---
 ... and our sample gives us an .hi-purple[estimated decision boundary].
-```{R, plot bayes est boundary, echo = F, cache = T, dependson = "gen bayes data"}
+```{r, plot bayes est boundary, echo = F, cache = T, dependson = "gen bayes data"}
 ggplot(data = bayes_truth, aes(x1, x2, color = y)) +
 geom_point(shape = 20, size = 0.5) +
 geom_contour(
@@ -785,9 +816,10 @@ scale_color_viridis_c(option = "magma", begin = 0.1, end = 0.85) +
 theme_void() +
 theme(legend.position = "none")
 ```
+
 ---
 And a new sample gives us another .hi-turquoise[estimated decision boundary].
-```{R, plot bayes est boundary 2, echo = F, cache = T, dependson = "gen bayes data"}
+```{r, plot bayes est boundary 2, echo = F, cache = T, dependson = "gen bayes data"}
 ggplot(data = bayes_truth, aes(x1, x2, color = y)) +
 geom_point(shape = 20, size = 0.5) +
 geom_contour(
@@ -811,9 +843,11 @@ scale_color_viridis_c(option = "magma", begin = 0.1, end = 0.85) +
 theme_void() +
 theme(legend.position = "none")
 ```
+
 ---
 
 One non-parametric way to estimate these unknown conditional probabilities: K-nearest neighbors (KNN).
+
 ---
 layout: true
 # K-nearest neighbors
@@ -839,6 +873,7 @@ We then assign observation $\color{#6A5ACD}{\mathbf{x_0}}$ to the class with the
 .footnote[
 .pink[†] In $\color{#6A5ACD}{\mathbf{X}}$ space.
 ]
+
 ---
 name: knn-fig
 layout: false
@@ -846,20 +881,22 @@ class: clear, middle
 
 .b[KNN in action]
 <br>.note[Left:] K=3 estimation for "x".       .note[Right:] KNN decision boundaries.
-```{R, fig knn, echo = F}
+```{r, fig knn, echo = F}
 include_graphics("images/isl-knn.png")
 ```
 .smaller.it[Source: ISL]
+
 ---
 class: clear, middle
 
 The choice of K is very important—ranging from super flexible to inflexible.
+
 ---
 name: ex-knn
 class: clear, middle
 
 Decision boundaries: .hi-pink[Bayes], .hi-purple[K=1], and .hi-turquoise[K=60]
-```{R, plot knn k, echo = F, cache = T, dependson = "gen bayes data"}
+```{r, plot knn k, echo = F, cache = T, dependson = "gen bayes data"}
 ggplot(data = bayes_truth, aes(x1, x2, color = y)) +
 geom_point(shape = 20, size = 0.5) +
 geom_contour(
@@ -883,13 +920,15 @@ scale_color_viridis_c(option = "magma", begin = 0.1, end = 0.85) +
 theme_void() +
 theme(legend.position = "none")
 ```
+
 ---
 class: clear, middle
 .b[KNN error rates], as K increases
-```{R, fig knn error, echo = F, out.width = '85%'}
+```{r, fig knn error, echo = F, out.width = '85%'}
 include_graphics("images/isl-knn-error.png")
 ```
 .smaller.it[Source: ISL]
+
 ---
 # Model accuracy
 ## Summary
@@ -899,6 +938,7 @@ The bias-variance tradeoff is central to quality prediction.
 - Benefits and costs of increasing model flexibility
 - U-shaped test error curves
 - Avoid overfitting—including in test data
+
 ---
 name: sources
 layout: false
@@ -911,6 +951,7 @@ These notes draw upon
 - [Python Data Science Handbook](https://jakevdp.github.io/PythonDataScienceHandbook/)<br>Jake VanderPlas
 
 - ['Chihuahua or Muffin' is from Twitter](https://twitter.com/teenybiscuit/status/705232709220769792)
+
 ---
 # Table of contents
 
@@ -953,6 +994,6 @@ These notes draw upon
 ---
 exclude: true
 
-```{R, save pdfs, include = F, eval = F}
-pagedown::chrome_print("002-slides.html", "002-slides.pdf")
+```{r, build pdfs, include = F, eval = F}
+pagedown::chrome_print("002-slides.html", "002-slides.pdf", wait = 4, timeout = 120)
 ```

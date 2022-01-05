@@ -43,6 +43,8 @@ Welcome to Economics 524 (424): Prediction and machine-learning in econometrics,
 
 **Formats** [.html](https://raw.githack.com/edrubin/EC524W22/master/lecture/000/000-slides.html) | [.pdf](https://raw.githack.com/edrubin/EC524W22/master/lecture/000/000-slides.pdf) | [.Rmd](https://raw.githack.com/edrubin/EC524W22/master/lecture/000/000-slides.Rmd)
 
+**Readings** Introduction in *ISL*
+
 [**001 - Statistical learning foundations**](https://raw.githack.com/edrubin/EC524W22/master/lecture/001/001-slides.html)
 
 1. Why do we have a class on prediction?
@@ -51,13 +53,27 @@ Welcome to Economics 524 (424): Prediction and machine-learning in econometrics,
 
 **Formats** [.html](https://raw.githack.com/edrubin/EC524W22/master/lecture/001/001-slides.html) | [.pdf](https://raw.githack.com/edrubin/EC524W22/master/lecture/001/001-slides.pdf) | [.Rmd](https://raw.githack.com/edrubin/EC524W22/master/lecture/001/001-slides.Rmd)
 
-**002 - Model accuracy**
+**Readings**
+
+- [Prediction Policy Problems](https://www.aeaweb.org/articles?id=10.1257/aer.p20151023) by Kleinberg .it[et al.] (2015)
+- *ISL* Ch1
+- *ISL* Start Ch2
+
+
+[**002 - Model accuracy**](https://raw.githack.com/edrubin/EC524W22/master/lecture/002/002-slides.html)
 
 1. Model accuracy
 1. Loss for regression and classification
 1. The variance-bias tradeoff
 1. The Bayes classifier
 1. KNN
+
+**Formats** [.html](https://raw.githack.com/edrubin/EC524W22/master/lecture/002/002-slides.html) | [.pdf](https://raw.githack.com/edrubin/EC524W22/master/lecture/002/002-slides.pdf) | [.Rmd](https://raw.githack.com/edrubin/EC524W22/master/lecture/002/002-slides.Rmd)
+
+**Readings** 
+
+- *ISL* Ch2–Ch3
+- *Optional:* *100ML* Preface and Ch1–Ch4
 
 **003 - Resampling methods**
 
@@ -66,6 +82,11 @@ Welcome to Economics 524 (424): Prediction and machine-learning in econometrics,
 1. Leave-out-out cross validation
 1. k-fold cross validation
 1. The bootstrap
+
+**Readings**
+
+- *ISL* Ch5
+- *Optional:* *100ML* Ch5
 
 **004 - Linear regression strikes back**
 
