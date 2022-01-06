@@ -1,4 +1,4 @@
-This is LuaTeX, Version 1.07.0 (TeX Live 2018)  (format=lualatex 2018.4.16)  3 JAN 2022 09:16
+This is LuaTeX, Version 1.07.0 (TeX Live 2018)  (format=lualatex 2018.4.16)  6 JAN 2022 12:18
  restricted system commands enabled.
 **syllabus.tex
 (./syllabus.tex
@@ -35,7 +35,7 @@ Inserting `luaotfload.aux.set_capheight' at position 3 in `luaotfload.patch_font
 '.
 Inserting `luaotfload.rewrite_fontname' at position 4 in `luaotfload.patch_font'
 .
-luaotfload | main : initialization completed in 0.103 seconds
+luaotfload | main : initialization completed in 0.094 seconds
 Babel <3.18> and hyphenation patterns for 1 language(s) loaded.
 (/usr/local/texlive/2018/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
@@ -1265,7 +1265,7 @@ Here is how much of LuaTeX's memory you used:
  572 words of node memory still in use:
    6 hlist, 2 vlist, 2 rule, 5 glue, 1 kern, 12 attribute, 63 glue_spec, 12 attr
 ibute_list, 1 write, 2 pdf_action nodes
-   avail lists: 2:563,3:131,4:76,5:553,6:35,7:2842,8:45,9:140,10:5,11:205
+   avail lists: 2:563,3:131,4:76,5:553,6:35,7:2842,8:47,9:140,10:5,11:205
  26217 multiletter control sequences out of 65536+600000
  92 fonts using 17464759 bytes
  39i,11n,67p,493b,825s stack positions out of 5000i,500n,10000p,200000b,100000s
@@ -1280,10 +1280,10 @@ tf></usr/local/texlive/2018/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></usr/lo
 cal/texlive/2018/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></usr/local/texlive/
 2018/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/texlive/2018/texmf-d
 ist/fonts/type1/public/lm/lmsy10.pfb>
-Output written on syllabus.pdf (6 pages, 72398 bytes).
+Output written on syllabus.pdf (6 pages, 72725 bytes).
 
-PDF statistics: 205 PDF objects out of 1000 (max. 8388607)
- 173 compressed objects within 2 object streams
+PDF statistics: 207 PDF objects out of 1000 (max. 8388607)
+ 175 compressed objects within 2 object streams
  78 named destinations out of 1000 (max. 131072)
  1 words of extra memory for PDF output out of 10000 (max. 100000000)
 

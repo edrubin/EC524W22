@@ -76,7 +76,7 @@ name: admin-today
   - [RStudio](https://education.rstudio.com/learn/) cheatsheets, books, and tutorials
   - [UO library](http://uoregon.libcal.com/calendar/dataservices/?cid=11979&t=g&d=0000-00-00&cal=11979,11173)
   - See course page for more...
-- .note[Content:] Formale statistical learning, notation, goals (and problems)
+- .note[Content:] Formalize statistical learning, notation, goals (and problems)
 
 ---
 layout: false
