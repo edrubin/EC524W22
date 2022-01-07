@@ -1,22 +1,23 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
   <head>
     <title>Lab .mono[000]</title>
     <meta charset="utf-8" />
     <meta name="author" content="Edward Rubin" />
-    <meta name="date" content="2020-01-08" />
+    <meta name="date" content="2021-01-08" />
+    <script src="000-slides_files/header-attrs-2.11/header-attrs.js"></script>
     <link href="000-slides_files/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="000-slides_files/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
     <link href="000-slides_files/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
-    <script src="000-slides_files/htmlwidgets-1.5.1/htmlwidgets.js"></script>
-    <script src="000-slides_files/jquery-1.12.4/jquery.min.js"></script>
+    <script src="000-slides_files/htmlwidgets-1.5.4/htmlwidgets.js"></script>
     <link href="000-slides_files/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
-    <script src="000-slides_files/datatables-binding-0.8/datatables.js"></script>
-    <link href="000-slides_files/dt-core-1.10.16/css/jquery.dataTables.min.css" rel="stylesheet" />
-    <link href="000-slides_files/dt-core-1.10.16/css/jquery.dataTables.extra.css" rel="stylesheet" />
-    <script src="000-slides_files/dt-core-1.10.16/js/jquery.dataTables.min.js"></script>
-    <link href="000-slides_files/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
-    <script src="000-slides_files/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+    <script src="000-slides_files/datatables-binding-0.20/datatables.js"></script>
+    <script src="000-slides_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+    <link href="000-slides_files/dt-core-1.11.3/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="000-slides_files/dt-core-1.11.3/css/jquery.dataTables.extra.css" rel="stylesheet" />
+    <script src="000-slides_files/dt-core-1.11.3/js/jquery.dataTables.min.js"></script>
+    <link href="000-slides_files/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+    <script src="000-slides_files/crosstalk-1.2.0/js/crosstalk.min.js"></script>
     <link rel="stylesheet" href="my-css.css" type="text/css" />
   </head>
   <body>
@@ -26,7 +27,7 @@ class: center, middle, inverse, title-slide
 # Lab .mono[000]
 ## Data cleaning and workflow [1/N]
 ### Edward Rubin
-### 08 January 2020
+### 08 January 2021
 
 ---
 
@@ -48,9 +49,7 @@ Basic .hi[workflow] (best) practices (_i.e._, _Projects_)
 
 .note[Reminders] 
 
-.b.slate[First assignment] due Thursday
-
-.b.slate[Readings] for next week
+.b.slate[Reminder:] Readings for next week
 - ISL Ch1–Ch2
 - [Prediction Policy Problems](https://www.aeaweb.org/articles?id=10.1257/aer.p20151023) by Kleinberg .it[et al.] (2015)
 ---
@@ -181,7 +180,8 @@ Finally, you can customize the actual layout and many other items.
 ---
 name: best-practices
 # .mono[R] and .mono[RStudio]
-## Related best practices
+
+.b.slate[Related best practices]
 
 1. Write code in .mono[R] scripts. Troubleshoot in .mono[RStudio]. Then run the scripts.
 
@@ -194,6 +194,7 @@ name: best-practices
 1. Write code that is readable (see comments comment above).
 
 1. Use projects in .mono[RStudio] (next). And organize your projects.
+
 ---
 layout: true
 # Projects
@@ -243,7 +244,8 @@ class: clear
 ---
 layout: true
 # .mono[R] and .mono[RStudio]
-## Projects
+
+.b.slate[Projects]
 
 ---
 
@@ -273,7 +275,8 @@ layout: true
 class: inverse, middle
 
 ---
-## Introduction
+
+.b.slate[Introduction]
 
 1. Pipes (`%&gt;%`) make your life easier..super[.pink[†]]
 
@@ -283,17 +286,22 @@ class: inverse, middle
 ---
 name: pipes
 
-## Pipes
-
-We can't go much deeper into the land of `dplyr` without mentioning pipes.
+.b.slate[What is a pipe?]
 
 --
 
-A *pipe* in programming allows you to take the output of one function and plug it into another function as an argument/input.
+Pipes are a .pink[simplifying] programming tool; make your code easier to read
 
 --
 
-In `dplyr`, the expression for a pipe is `%&gt;%`.
+Take the .hi-pink[output] of a function as the .hi-purple[input/argument] of another function
+
+--
+
+In `dplyr`, the expression for a pipe is `%&gt;%`
+
+.footnote[.pink[†] `|&gt;` native pipe as of .mono[R] 4.1.0
+]
 
 --
 
@@ -307,13 +315,13 @@ rnorm(10) %&gt;% mean()
 ```
 
 ```
-#&gt; [1] -0.5106544
+#&gt; [1] -0.3209758
 ```
 ---
 
-## Pipes
+.b.slate[Pipes]
 
-Pipes help avoid lots of nested functions, prevent excessive writing to your disc, and increase the readability of our .mono[R] scripts.
+Pipes avoid nested functions, prevent excessive writing to your disc, and increase the readability of our .mono[R] scripts
 
 --
 
@@ -330,9 +338,13 @@ diff(quantile(rnorm(100), probs = c(0.25, 0.75)))
 # Piping 💪
 rnorm(100) %&gt;% quantile(probs = c(0.25, 0.75)) %&gt;% diff()
 ```
+
+--
+
+Think [russian dolls](https://en.wikipedia.org/wiki/Matryoshka_doll)
 ---
 
-## Pipes
+.b.slate[Pipes]
 
 By default, .mono[R] pipes the output from the LHS of the pipe into&lt;br&gt;the .hi[first] argument of the function on the RHS of the pipe.
 
@@ -357,15 +369,50 @@ If you want to pipe output into a different argument, you use a period (`.`).
 The `magrittr` package contains even more piping power.&lt;sup&gt;.pink[†]&lt;/sup&gt;
 
 .footnote[.pink[†] `magrittr` = Magritte (of [*this is not a pipe*](https://en.wikipedia.org/wiki/The_Treachery_of_Images) fame) plus .mono[R].]
+
 ---
 layout: true
 # dplyr
+
+---
+# dplyr
+
+.b.slate[Before we begin:]
+
+1. Ensure `tidyverse` is installed: `install.packages('tidyverse')`
+
+--
+
+1. Install `nycflights13` package: `install.packages('nycflights13')`
+
+--
+
+1. Load package libraries: `library(tidyverse, nycflights13)`
+
+--
+
+1. Test the `flights` dataset: `(flights)`
+
+<table class="huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-1">
+<col><col><col><col><col><col><col><tr>
+<th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">year</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">month</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">day</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">dep_time</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">sched_dep_time</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">dep_delay</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">arr_time</th></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">2013</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">1</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">1</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">517</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">515</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">2</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">830</td></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">2013</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">1</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">1</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">533</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">529</td><td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">4</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">850</td></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">2013</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">1</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">1</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">542</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">540</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">2</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">923</td></tr>
+</table>
+
+
+
+
 ---
 class: inverse, middle
 ---
 name: dplyr
 
-## Intro
+.b.slate[Introduction]
 
 It's a package.
 --
@@ -386,11 +433,14 @@ It's a package.
 
 --
 
+&lt;br&gt;
+
 .hi-slate[*Bonus*] `dplyr` is pretty fast and able to interact with SQL databases.
+
 ---
 name: mutate
 
-## Manipulating variables: `mutate()`
+.b-slate[Manipulating variables:] `mutate()`
 
 `dplyr` streamlines adding/manipulating variables in your data frame.
 
@@ -421,7 +471,6 @@ mutate(.data = our_df, new1 = 7, new2 = x * y)
 my_df &lt;- data.frame(x = 1:3, y = 5:7)
 ```
 
-
 --
 
 `mutate()` allows us to create many new variables with one call.
@@ -442,8 +491,8 @@ mutate(.data = my_df,
 --
 .pull-right[
 
-<div id="htmlwidget-e093f6bacd4e1d6fd765" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-e093f6bacd4e1d6fd765">{"x":{"filter":"none","data":[[1,2,3],[5,6,7],[5,12,21],[1,4,9],[25,144,441],[false,false,true]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>xy<\/th>\n      <th>x2<\/th>\n      <th>xy2<\/th>\n      <th>is_max<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1,2,3,4]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-47207ac418980c3d94ed" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-47207ac418980c3d94ed">{"x":{"filter":"none","vertical":false,"data":[[1,2,3],[5,6,7],[5,12,21],[1,4,9],[25,144,441],[false,false,true]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>xy<\/th>\n      <th>x2<\/th>\n      <th>xy2<\/th>\n      <th>is_max<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1,2,3,4]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 
 Notice `mutate()` returns the original *and* new columns.
 
@@ -475,6 +524,7 @@ The common workflow in `dplyr` will look something like
 `new_df &lt;- old_df %&gt;% mutate(cool stuff here)`
 
 which takes `old_df`, does some cool stuff with `mutate()`, and then saves the output of `mutate()` as `new_df`.
+
 ---
 
 ## `filter()`
@@ -514,8 +564,8 @@ count: false
 # Only keep rows where x is 3
 some_df %&gt;% filter(x == 3)
 ```
-<div id="htmlwidget-1a4135bbbc912458411b" style="width:200px;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-1a4135bbbc912458411b">{"x":{"filter":"none","data":[[3],[13]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-728c881f0852ecc6f43b" style="width:200px;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-728c881f0852ecc6f43b">{"x":{"filter":"none","vertical":false,"data":[[3],[13]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 ]
 ---
 
@@ -525,8 +575,8 @@ some_df %&gt;% filter(x == 3)
 # Only keep rows where x &gt; 7
 some_df %&gt;% filter(x &gt; 7)
 ```
-<div id="htmlwidget-14e77b0a00174e574bff" style="width:200px;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-14e77b0a00174e574bff">{"x":{"filter":"none","data":[[8,9,10],[18,19,20]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-ec06ceabcf1e7b11808b" style="width:200px;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ec06ceabcf1e7b11808b">{"x":{"filter":"none","vertical":false,"data":[[8,9,10],[18,19,20]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 ]
 ---
 
@@ -536,8 +586,8 @@ some_df %&gt;% filter(x &gt; 7)
 # Keep rows where y/x &gt; 3
 some_df %&gt;% filter(y/x &gt; 3)
 ```
-<div id="htmlwidget-716ec9367c13c12664ed" style="width:200px;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-716ec9367c13c12664ed">{"x":{"filter":"none","data":[[1,2,3,4],[11,12,13,14]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-374d2905e6a877bc0abe" style="width:200px;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-374d2905e6a877bc0abe">{"x":{"filter":"none","vertical":false,"data":[[1,2,3,4],[11,12,13,14]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 ]
 ---
 
@@ -548,8 +598,8 @@ some_df %&gt;% filter(y/x &gt; 3)
 some_df %&gt;%
   filter(x &gt; 8 | y &lt; 12)
 ```
-<div id="htmlwidget-887e26cbca6c6346c128" style="width:200px;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-887e26cbca6c6346c128">{"x":{"filter":"none","data":[[1,9,10],[11,19,20]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-ecc14f728ab1b56af7ca" style="width:200px;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ecc14f728ab1b56af7ca">{"x":{"filter":"none","vertical":false,"data":[[1,9,10],[11,19,20]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 ]
 ---
 
@@ -560,8 +610,8 @@ some_df %&gt;%
 some_df %&gt;%
   filter(between(y, 16, 18))
 ```
-<div id="htmlwidget-5835ab560422eb0f9698" style="width:200px;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-5835ab560422eb0f9698">{"x":{"filter":"none","data":[[6,7,8],[16,17,18]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-0548225684996c7563b8" style="width:200px;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-0548225684996c7563b8">{"x":{"filter":"none","vertical":false,"data":[[6,7,8],[16,17,18]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 ]
 ---
 
@@ -571,8 +621,8 @@ some_df %&gt;%
 # Keep rows where y &gt; 20
 some_df %&gt;% filter(y &gt; 20)
 ```
-<div id="htmlwidget-217f6fbb351a6af1bb22" style="width:200px;height:100px;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-217f6fbb351a6af1bb22">{"x":{"filter":"none","data":[[],[]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-3ede3236822a36f3d602" style="width:200px;height:100px;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3ede3236822a36f3d602">{"x":{"filter":"none","vertical":false,"data":[[],[]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 ]
 
 If you filter your data frame down to nothing, .mono[R] returns a 0-row data frame with the names/number of columns from the original data frame.
@@ -656,8 +706,8 @@ our_df &lt;- data.frame(
 )
 ```
 
-<div id="htmlwidget-cd703bd6f517327fff4c" style="width:50%;height:250px;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-cd703bd6f517327fff4c">{"x":{"filter":"none","data":[[1,2,3,4,5,6],[0,1,0,1,0,1],["A","A","A","B","B","B"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>grp<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-8087782ce8438f3b2934" style="width:50%;height:250px;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-8087782ce8438f3b2934">{"x":{"filter":"none","vertical":false,"data":[[1,2,3,4,5,6],[0,1,0,1,0,1],["A","A","A","B","B","B"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>grp<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 ]]
 
 --
@@ -673,8 +723,8 @@ our_df %&gt;%
   summarize(mean(x), mean(y))
 ```
 
-<div id="htmlwidget-35478e791a503dd0a9ab" style="width:100%;height:110px;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-35478e791a503dd0a9ab">{"x":{"filter":"none","data":[["A","B"],[2,5],[0.333333333333333,0.666666666666667]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>grp<\/th>\n      <th>mean(x)<\/th>\n      <th>mean(y)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[1,2]}],"order":[],"autoWidth":false,"orderClasses":false,"rowCallback":"function(row, data) {\nDTWidget.formatRound(this, row, data, 1, 3, 3, \",\", \".\");\nDTWidget.formatRound(this, row, data, 2, 3, 3, \",\", \".\");\n}"}},"evals":["options.rowCallback"],"jsHooks":[]}</script>
+<div id="htmlwidget-c02c2132a8e83b290245" style="width:100%;height:110px;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c02c2132a8e83b290245">{"x":{"filter":"none","vertical":false,"data":[["A","B"],[2,5],[0.333333333333333,0.666666666666667]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>grp<\/th>\n      <th>mean(x)<\/th>\n      <th>mean(y)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"targets":1,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 3, 3, \",\", \".\");\n  }"},{"targets":2,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 3, 3, \",\", \".\");\n  }"},{"className":"dt-right","targets":[1,2]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":["options.columnDefs.0.render","options.columnDefs.1.render"],"jsHooks":[]}</script>
 ]]
 ---
 
@@ -691,8 +741,8 @@ our_df &lt;- data.frame(
 )
 ```
 
-<div id="htmlwidget-fe5fbd40237aef51964c" style="width:50%;height:250px;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-fe5fbd40237aef51964c">{"x":{"filter":"none","data":[[1,2,3,4,5,6],[0,1,0,1,0,1],["A","A","A","B","B","B"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>grp<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-8fd11f3c3b78375ce3c9" style="width:50%;height:250px;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-8fd11f3c3b78375ce3c9">{"x":{"filter":"none","vertical":false,"data":[[1,2,3,4,5,6],[0,1,0,1,0,1],["A","A","A","B","B","B"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>grp<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 ]]
 
 --
@@ -708,8 +758,8 @@ our_df %&gt;%
   )
 ```
 
-<div id="htmlwidget-a64662fe5f672a2eedf3" style="width:100%;height:250px;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-a64662fe5f672a2eedf3">{"x":{"filter":"none","data":[[1,2,3,4,5,6],[0,1,0,1,0,1],["A","A","A","B","B","B"],[2,2,2,5,5,5],[0.333333333333333,0.333333333333333,0.333333333333333,0.666666666666667,0.666666666666667,0.666666666666667]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>grp<\/th>\n      <th>x_m<\/th>\n      <th>y_m<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1,3,4]}],"order":[],"autoWidth":false,"orderClasses":false,"rowCallback":"function(row, data) {\nDTWidget.formatRound(this, row, data, 3, 3, 3, \",\", \".\");\nDTWidget.formatRound(this, row, data, 4, 3, 3, \",\", \".\");\n}"}},"evals":["options.rowCallback"],"jsHooks":[]}</script>
+<div id="htmlwidget-9de486fb6cb5cb985e90" style="width:100%;height:250px;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9de486fb6cb5cb985e90">{"x":{"filter":"none","vertical":false,"data":[[1,2,3,4,5,6],[0,1,0,1,0,1],["A","A","A","B","B","B"],[2,2,2,5,5,5],[0.333333333333333,0.333333333333333,0.333333333333333,0.666666666666667,0.666666666666667,0.666666666666667]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>grp<\/th>\n      <th>x_m<\/th>\n      <th>y_m<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"targets":3,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 3, 3, \",\", \".\");\n  }"},{"targets":4,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 3, 3, \",\", \".\");\n  }"},{"className":"dt-right","targets":[0,1,3,4]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":["options.columnDefs.0.render","options.columnDefs.1.render"],"jsHooks":[]}</script>
 ]]
 
 ---
@@ -731,8 +781,8 @@ class: clear, middle
 # As is
 our_df
 ```
-<div id="htmlwidget-9477b452b50e3340da19" style="width:100%;height:250px;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-9477b452b50e3340da19">{"x":{"filter":"none","data":[[1,2,3,4,5,6],[0,1,0,1,0,1],["A","A","A","B","B","B"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>grp<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-5389e31c5234cf909c38" style="width:100%;height:250px;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5389e31c5234cf909c38">{"x":{"filter":"none","vertical":false,"data":[[1,2,3,4,5,6],[0,1,0,1,0,1],["A","A","A","B","B","B"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>grp<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 ]
 
 .pull-right[
@@ -741,8 +791,8 @@ our_df
 # Arrang by y, grp, then -x
 our_df %&gt;% arrange(y, grp, -x)
 ```
-<div id="htmlwidget-7e5ecc9817275eb362f1" style="width:100%;height:250px;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-7e5ecc9817275eb362f1">{"x":{"filter":"none","data":[[3,1,5,2,6,4],[0,0,0,1,1,1],["A","A","B","A","B","B"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>grp<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-1709ca4ec6f0b902e53e" style="width:100%;height:250px;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1709ca4ec6f0b902e53e">{"x":{"filter":"none","vertical":false,"data":[[3,1,5,2,6,4],[0,0,0,1,1,1],["A","A","B","A","B","B"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>x<\/th>\n      <th>y<\/th>\n      <th>grp<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","columnDefs":[{"className":"dt-right","targets":[0,1]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 ]
 
 ---
@@ -768,6 +818,20 @@ The folks at RStudio have put together some great cheatsheets, *e.g.*,
 - [`dplyr`](https://raw.githack.com/edrubin/EC524W20/master/resources/cheatsheet-dplyr.pdf)
 - [data import](https://raw.githack.com/edrubin/EC524W20/master/resources/cheatsheet-data-import.pdf)
 - [data wrangling](https://raw.githack.com/edrubin/EC524W20/master/resources/cheatsheet-data-wrangling.pdf)
+
+---
+# Exercises
+
+Some selected exercises from [R for Data Science](https://r4ds.had.co.nz/index.html) by Hadley Wickham
+
+1. Exercise [5.2.4.1](https://r4ds.had.co.nz/transform.html#exercises-8)
+
+1. Exercise [5.3.1.2, 5.3.1.3, 5.3.1.4](https://r4ds.had.co.nz/transform.html#exercises-9)
+
+1. Exercise [5.5.2.4](https://r4ds.had.co.nz/transform.html#exercises-11)
+
+1. Exercise [5.7.1.3](https://r4ds.had.co.nz/transform.html#exercises-13)
+
 ---
 layout: false
 # Table of contents
@@ -798,6 +862,7 @@ layout: false
 - [The `tidyverse`](#tidyverse)
 ]
 ]
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
@@ -845,6 +910,32 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
 // adds .remark-code-has-line-highlighted class to <pre> parent elements
 // of code chunks containing highlighted lines with class .remark-code-line-highlighted
 (function(d) {
@@ -862,17 +953,6 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
-
-<script>
-(function() {
-  var links = document.getElementsByTagName('a');
-  for (var i = 0; i < links.length; i++) {
-    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
-      links[i].target = '_blank';
-    }
-  }
-})();
-</script>
 
 <script>
 slideshow._releaseMath = function(el) {

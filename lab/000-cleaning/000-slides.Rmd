@@ -69,9 +69,7 @@ Basic .hi[workflow] (best) practices (_i.e._, _Projects_)
 
 .note[Reminders] 
 
-.b.slate[First assignment] due Thursday
-
-.b.slate[Readings] for next week
+.b.slate[Reminder:] Readings for next week
 - ISL Ch1–Ch2
 - [Prediction Policy Problems](https://www.aeaweb.org/articles?id=10.1257/aer.p20151023) by Kleinberg .it[et al.] (2015)
 ---
@@ -232,7 +230,8 @@ knitr::include_graphics("images/rstudio/rstudio_customize.png")
 ---
 name: best-practices
 # .mono[R] and .mono[RStudio]
-## Related best practices
+
+.b.slate[Related best practices]
 
 1. Write code in .mono[R] scripts. Troubleshoot in .mono[RStudio]. Then run the scripts.
 
@@ -245,6 +244,7 @@ name: best-practices
 1. Write code that is readable (see comments comment above).
 
 1. Use projects in .mono[RStudio] (next). And organize your projects.
+
 ---
 layout: true
 # Projects
@@ -302,7 +302,8 @@ knitr::include_graphics("images/rstudio/rstudio_projects3.png")
 ---
 layout: true
 # .mono[R] and .mono[RStudio]
-## Projects
+
+.b.slate[Projects]
 
 ---
 
@@ -332,7 +333,8 @@ layout: true
 class: inverse, middle
 
 ---
-## Introduction
+
+.b.slate[Introduction]
 
 1. Pipes (`%>%`) make your life easier..super[.pink[†]]
 
@@ -342,17 +344,22 @@ class: inverse, middle
 ---
 name: pipes
 
-## Pipes
-
-We can't go much deeper into the land of `dplyr` without mentioning pipes.
+.b.slate[What is a pipe?]
 
 --
 
-A *pipe* in programming allows you to take the output of one function and plug it into another function as an argument/input.
+Pipes are a .pink[simplifying] programming tool; make your code easier to read
 
 --
 
-In `dplyr`, the expression for a pipe is `%>%`.
+Take the .hi-pink[output] of a function as the .hi-purple[input/argument] of another function
+
+--
+
+In `dplyr`, the expression for a pipe is `%>%`
+
+.footnote[.pink[†] `|>` native pipe as of .mono[R] 4.1.0
+]
 
 --
 
@@ -365,9 +372,9 @@ rnorm(10) %>% mean()
 ```
 ---
 
-## Pipes
+.b.slate[Pipes]
 
-Pipes help avoid lots of nested functions, prevent excessive writing to your disc, and increase the readability of our .mono[R] scripts.
+Pipes avoid nested functions, prevent excessive writing to your disc, and increase the readability of our .mono[R] scripts
 
 --
 
@@ -383,9 +390,13 @@ diff(quantile(rnorm(100), probs = c(0.25, 0.75)))
 # Piping 💪
 rnorm(100) %>% quantile(probs = c(0.25, 0.75)) %>% diff()
 ```
+
+--
+
+Think [russian dolls](https://en.wikipedia.org/wiki/Matryoshka_doll)
 ---
 
-## Pipes
+.b.slate[Pipes]
 
 By default, .mono[R] pipes the output from the LHS of the pipe into<br>the .hi[first] argument of the function on the RHS of the pipe.
 
@@ -410,15 +421,44 @@ If you want to pipe output into a different argument, you use a period (`.`).
 The `magrittr` package contains even more piping power.<sup>.pink[†]</sup>
 
 .footnote[.pink[†] `magrittr` = Magritte (of [*this is not a pipe*](https://en.wikipedia.org/wiki/The_Treachery_of_Images) fame) plus .mono[R].]
+
 ---
 layout: true
 # dplyr
+
+---
+# dplyr
+
+.b.slate[Before we begin:]
+
+1. Ensure `tidyverse` is installed: `install.packages('tidyverse')`
+
+--
+
+1. Install `nycflights13` package: `install.packages('nycflights13')`
+
+--
+
+1. Load package libraries: `library(tidyverse, nycflights13)`
+
+--
+
+1. Test the `flights` dataset: `(flights)`
+
+```{r, echo = FALSE}
+pacman::p_load(nycflights13)
+flights |> select(year, month, day, dep_time, sched_dep_time, dep_delay, arr_time) |> 
+head(3)
+```
+
+
+
 ---
 class: inverse, middle
 ---
 name: dplyr
 
-## Intro
+.b.slate[Introduction]
 
 It's a package.
 --
@@ -439,11 +479,14 @@ It's a package.
 
 --
 
+<br>
+
 .hi-slate[*Bonus*] `dplyr` is pretty fast and able to interact with SQL databases.
+
 ---
 name: mutate
 
-## Manipulating variables: `mutate()`
+.b-slate[Manipulating variables:] `mutate()`
 
 `dplyr` streamlines adding/manipulating variables in your data frame.
 
@@ -471,7 +514,6 @@ mutate(.data = our_df, new1 = 7, new2 = x * y)
 ```{R, ex_mutate2_df}
 my_df <- data.frame(x = 1:3, y = 5:7)
 ```
-
 
 --
 
@@ -531,6 +573,7 @@ The common workflow in `dplyr` will look something like
 `new_df <- old_df %>% mutate(cool stuff here)`
 
 which takes `old_df`, does some cool stuff with `mutate()`, and then saves the output of `mutate()` as `new_df`.
+
 ---
 
 ## `filter()`
@@ -848,6 +891,20 @@ The folks at RStudio have put together some great cheatsheets, *e.g.*,
 - [`dplyr`](https://raw.githack.com/edrubin/EC524W20/master/resources/cheatsheet-dplyr.pdf)
 - [data import](https://raw.githack.com/edrubin/EC524W20/master/resources/cheatsheet-data-import.pdf)
 - [data wrangling](https://raw.githack.com/edrubin/EC524W20/master/resources/cheatsheet-data-wrangling.pdf)
+
+---
+# Exercises
+
+Some selected exercises from [R for Data Science](https://r4ds.had.co.nz/index.html) by Hadley Wickham
+
+1. Exercise [5.2.4.1](https://r4ds.had.co.nz/transform.html#exercises-8)
+
+1. Exercise [5.3.1.2, 5.3.1.3, 5.3.1.4](https://r4ds.had.co.nz/transform.html#exercises-9)
+
+1. Exercise [5.5.2.4](https://r4ds.had.co.nz/transform.html#exercises-11)
+
+1. Exercise [5.7.1.3](https://r4ds.had.co.nz/transform.html#exercises-13)
+
 ---
 layout: false
 # Table of contents
