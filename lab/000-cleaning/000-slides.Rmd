@@ -2,8 +2,8 @@
 title: "Lab .mono[000]"
 subtitle: "Data cleaning and workflow [1/N]"
 author: "Edward Rubin"
-#date: "`r format(Sys.time(), '%d %B %Y')`"
-date: "08 January 2021"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+#date: "08 January 2021"
 output:
   xaringan::moon_reader:
     css: ['default', 'metropolis', 'metropolis-fonts', 'my-css.css']
@@ -12,6 +12,7 @@ output:
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
+knit: pagedown::chrome_print
 ---
 exclude: true
 
