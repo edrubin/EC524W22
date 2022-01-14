@@ -77,13 +77,15 @@ Welcome to Economics 524 (424): Prediction and machine-learning in econometrics,
 - *ISL* Ch2–Ch3
 - *Optional:* *100ML* Preface and Ch1–Ch4
 
-**003 - Resampling methods**
+[**003 - Resampling methods**](https://raw.githack.com/edrubin/EC524W22/master/lecture/003/003-slides.html)
 
 1. Review
 1. The validation-set approach
 1. Leave-out-out cross validation
 1. k-fold cross validation
 1. The bootstrap
+
+**Formats** [.html](https://raw.githack.com/edrubin/EC524W22/master/lecture/003/003-slides.html) | [.pdf](https://raw.githack.com/edrubin/EC524W22/master/lecture/003/003-slides.pdf) | [.Rmd](https://raw.githack.com/edrubin/EC524W22/master/lecture/003/003-slides.Rmd)
 
 **Readings**
 
@@ -143,7 +145,7 @@ Welcome to Economics 524 (424): Prediction and machine-learning in econometrics,
 
 Planned projects
 
-**000** Predicting sales price in housing data (Kaggle)
+**000** [Predicting sales price in housing data (Kaggle)](https://github.com/edrubin/EC524W22/tree/master/projects/project-000)
 
 **Help:** 
 
