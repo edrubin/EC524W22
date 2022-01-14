@@ -184,7 +184,10 @@ Approximate/planned topics...
 **001 - Data cleaning: Multiple mutations**
 
 1. Finish previous lab on `dplyr`
-2. Extending `dplyr` and `mutate`
+2. Working with projects
+3. Housing data
+    -[data](lab/001-cleaning/data/house-prices-advanced-regression-techniques.zip)
+4. Extending `dplyr` and `mutate`
 
 **002 - Validation**
 
