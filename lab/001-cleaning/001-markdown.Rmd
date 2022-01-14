@@ -1,0 +1,310 @@
+---
+title: "Lab 001"
+subtitle: "Data cleaning"
+author: "Andrew Dickinson"
+date: </br>`r format(Sys.time(), '%d %B %Y')`
+header-includes:
+  - \usepackage{mathtools}
+  - \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+  - \usepackage{amssymb}
+output: 
+  html_document:
+    toc: false
+    toc_depth: 3  
+    number_sections: false
+    theme: flatly
+    highlight: tango  
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+---
+
+```{r setup, include=FALSE}
+## These next lines set the default behavior for all R chunks in the .Rmd document.
+## I recommend you take a look here: https://rmarkdown.rstudio.com/authoring_rcodechunks.html
+knitr::opts_chunk$set(echo = TRUE) ## Show all R output
+knitr::opts_chunk$set(cache = FALSE) ## Cache the results to increase performance.
+knitr::opts_chunk$set(warning = FALSE) ## Limit warnings
+knitr::opts_chunk$set(message = FALSE) ## Limit warnings
+```
+
+```{r, echo=FALSE}
+pacman::p_load(tidyverse)
+```
+```{r, echo=FALSE}
+# Setup ----------------------------------------------------------------------------------
+# Options
+options(stringsAsFactors = F)
+# Packages
+# devtools::install_github("tidymodels/parsnip")
+pacman::p_load(
+  tidyverse, data.table, lubridate,
+  ranger, parsnip,
+  magrittr, here
+)
+
+# Load data ------------------------------------------------------------------------------
+# Training data
+train_dt = here('data', 'train.csv') %>% fread()
+# Testing data
+test_dt = here('data', 'test.csv') %>% fread()
+
+# Data work ------------------------------------------------------------------------------
+# Replace "NA" in alley with "No"
+train_dt[is.na(Alley), Alley := "No"]
+test_dt[is.na(Alley), Alley := "No"]
+# Same with fence
+train_dt[is.na(Fence), Fence := "No"]
+test_dt[is.na(Fence), Fence := "No"]
+# and MSZoning
+train_dt[is.na(MSZoning), MSZoning := "No"]
+test_dt[is.na(MSZoning), MSZoning := "No"]
+# and Utilities
+train_dt[is.na(Utilities), Utilities := "No"]
+test_dt[is.na(Utilities), Utilities := "No"]
+# and MiscFeature
+train_dt[is.na(MiscFeature), MiscFeature := "No"]
+test_dt[is.na(MiscFeature), MiscFeature := "No"]
+# and LotFrontage
+train_dt[is.na(LotFrontage), LotFrontage := 0]
+test_dt[is.na(LotFrontage), LotFrontage := 0]
+# and MasVnrArea
+train_dt[is.na(MasVnrArea), MasVnrArea := 0]
+test_dt[is.na(MasVnrArea), MasVnrArea := 0]
+# and MasVnrType
+train_dt[is.na(MasVnrType), MasVnrType := "None"]
+test_dt[is.na(MasVnrType), MasVnrType := "None"]
+# and SaleType
+train_dt[is.na(SaleType), SaleType := "?"]
+test_dt[is.na(SaleType), SaleType := "?"]
+# and Exterior1st
+train_dt[is.na(Exterior1st), Exterior1st := "?"]
+test_dt[is.na(Exterior1st), Exterior1st := "?"]
+# and Exterior2nd
+train_dt[is.na(Exterior2nd), Exterior2nd := "?"]
+test_dt[is.na(Exterior2nd), Exterior2nd := "?"]
+# and KitchenQual
+train_dt[is.na(KitchenQual), KitchenQual := "?"]
+test_dt[is.na(KitchenQual), KitchenQual := "?"]
+# Drop PoolQC
+train_dt[, PoolQC := NULL]
+test_dt[, PoolQC := NULL]
+# Drop FireplaceQu
+train_dt[, FireplaceQu := NULL]
+test_dt[, FireplaceQu := NULL]
+```
+
+# {.tabset .tabset-fade .tabset-pills}
+
+## Introduction
+
+In an effort to make this lab as useful as possible, I am going to change things up a little bit from last week.
+
+- Going to try to move away from lecture slides, standing in the front of the room with a clicker
+- Be more active; live coding; working with data (that you are using in your projects) in front of you all
+- Sit down and code more rather talk about it
+- Give more tips and tricks; provide examples and code snippets
+
+As the quarter progresses, I hope to spend more time providing materials, tips/tricks, methods etc. for helping you all finish the projects and understand how to code what we are doing in class.
+
+I will continue to make adjustments to lab to make this time more productive- any feedback is greatly appreciated.
+
+Furthermore, I am keeping a list of "miscellaneous" topics to go over that I have found super helpful. Let me know if there are any particular topics you all are interested in!
+
+#### Last week
+
+We talked about:
+
+- Rstudio
+- Projects in Rstudio
+- Pipe operators
+- `dplyr` verbs (ran out of time for most of these)
+  - `select()`
+  - `filter()`
+  - `arrange()`
+  - `mutate()`
+  - `group_by` + `summarize()`
+  
+This week I want to apply these topics with an actual project- __project-000__
+
+## Outline
+
+(i.) Setup project-000
+
+- File management
+- Using `here()`
+- Writing scripts
+
+(ii.) Question 03 _"Get a feel for the data- graphs, summaries, etc"_
+
+- View()
+- skim()
+- clean_names()
+- Using pipes, `dpylr` and `ggplot2`
+
+(iii.) Coding errors
+
+- Erik's coding error
+  - Namespace conflicts
+- How to google for help
+
+## Setup project-000
+
+__First__ open up Rstudio and close any projects; start a new project
+- I recommend a new Rstudio project for each project in this class
+
+_Note:_ Having a __clean__ and __organized__ file system is extremely important!
+
+Here's how I would set up my filesystem:
+
+`Home > Documents > classes > prediction > projects > project-000`
+
+Within `project-000` I would create two folders, one for r scripts/markdown called `R/` and one for data called `data/`
+
+I have posted the a [link](https://github.com/edrubin/EC524W22/raw/master/lab/001-cleaning/data/house-prices-advanced-regression-techniques.zip) to a `.zip` file of the housing data on the `README.md`. Download this to your `data/` folder and unzip it
+
+For simplicity I copied Ed's `data.table()` code from from Connor Lennon's [Rpubs page](https://rpubs.com/Clennon/KagNotes) page on kaggle notebooks on a new `R` script
+
+_Note: Let me know if you guys are interested in learning about `data.table`!!_
+
+## "Get a feel for the data"
+
+Question 03 (bullet 2) says "Get a feel for the data- graphs, summaries, etc"
+
+__I cannot stress enough how important it is that you do this with each new dataset you come across!__
+
+Before you ever run a regression:
+
+- plot the data to look for patterns
+- Look at the data set using `View()`, `glimpse()`, or `skimr::skim()`
+
+<br>
+
+#### Sidebar: Codebooks
+
+Codebooks are extremely useful for understanding variables and what the heck the variable names mean. Read the codebook always.
+
+- I like to print them out and tape them to my wall
+
+<br>
+
+Let's use `dplyr` and `ggplot2` to plot the data using pipe operators!
+
+In class example of how to use these two packages to analyze different cuts of housing data
+
+_Note: this is really simple visualization with little forethought.. Just a showcase of how to use these packages together!_
+
+```{r, fig.width=10, fig.height=6}
+train_dt_new = train_dt %>% 
+  janitor::clean_names('upper_camel')
+
+train_dt_new %>% 
+  rename(FirstFloorSF = X1StFlrSf,
+         SecondFloorSF = X2NdFlrSf) %>% 
+  mutate(TotalSqFt = FirstFloorSF + SecondFloorSF,
+         TotalSqFt_binned = round(TotalSqFt, digits = -2)) %>% 
+  group_by(TotalSqFt_binned, YearBuilt) %>% 
+    summarize(MeanSalePrice = mean(SalePrice),
+              MeanOverallQual = mean(OverallQual)) %>% 
+  ungroup() %>% 
+  mutate(PostWWII = ifelse(YearBuilt > 1945, "Post WWII", "Pre WWII")) %>% 
+  ggplot(aes(x = YearBuilt, y = MeanSalePrice,  color = TotalSqFt_binned)) +
+    geom_point(alpha = 0.5, size = 3) +
+    hrbrthemes::theme_ipsum() +
+    theme(
+      panel.grid.minor = element_blank(),
+      legend.position = 'right'
+      # panel.grid.minor = element_blank()
+    ) +
+    labs(
+      x = "Year of construction",
+      y = "Mean sales price",
+      title = "Ames housing data",
+      caption = "Andrew is really cool",
+      color = 'Total square feet'
+    ) + 
+    # facet_wrap(~ PostWWII) +
+    scale_y_continuous(labels = scales::comma) +
+    scale_x_continuous(breaks = seq(1900, 2010, 50)) +
+    scale_color_viridis_c(option = 'magma', begin = 0, end = 0.75) +
+    scale_size_continuous(range = c(0.2,3))
+```
+
+## Coding errors
+
+First, how is the project going? Is anyone struggling with any errors that they need help with?
+
+Erik came across a very annoying error that I want you all to know about
+- Took me a minute to figure this one out
+- Some of you may not have come across it
+
+If you used some of Ed's code, specfically the `predict()` function he used, you will come across an error that looks like this
+
+
+```{r}
+# Train a model --------------------------------------------------------------------------
+# Train the model
+model_trained = rand_forest(mode = "regression", mtry = 12, trees = 10000) %>%
+  set_engine("ranger", seed = 12345, num.threads = 10) %>%
+  fit_xy(
+    y = train_dt[,SalePrice],
+    x = train_dt[,-c("Id", "SalePrice")] %>%
+      select(MSSubClass:Foundation, KitchenQual, PoolArea:SaleCondition)
+  )
+# Predict onto testing data
+new_predictions = predict(
+  model_trained,
+  new_data = test_dt
+)
+# Data to submit
+# NOTE: Names and capitalization matter
+to_submit = data.frame(
+  Id = test_dt$Id,
+  SalePrice = new_predictions$.pred
+)
+# # File to submit
+# write_csv(
+#   x = to_submit,
+#   path = here("data", "to-submit-001.csv")
+# )
+```
+
+```{r}
+# Train a model --------------------------------------------------------------------------
+#- testing performance 
+
+model_trained_new = lm(SalePrice ~ LotArea,
+                         data = train_dt)
+
+# predictions_testing = predict(
+#   object = model_trained_new,
+#   new_data = test_dt
+# ) %>% as.data.frame()
+# 
+# test_performance = data.frame(
+#   Id = test_dt$Id,
+#   SalePrice = predictions_testing$.
+# )
+
+```
+
+```{r}
+# Train a model --------------------------------------------------------------------------
+#- testing performance 
+
+model_trained_new = lm(SalePrice ~ LotArea,
+                         data = train_dt)
+
+predictions_testing = predict(
+  object = model_trained_new,
+  newdata = test_dt
+) %>% as.data.frame()
+
+test_performance = data.frame(
+  Id = test_dt$Id,
+  SalePrice = predictions_testing$.
+)
+
+```
+
+

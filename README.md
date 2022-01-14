@@ -181,7 +181,8 @@ Approximate/planned topics...
 
 **Formats** [.html](https://raw.githack.com/edrubin/EC524W22/master/lab/000-cleaning/000-slides.html) | [.pdf](https://raw.githack.com/edrubin/EC524W22/master/lab/000-cleaning/000-slides.pdf) | [.Rmd](https://raw.githack.com/edrubin/EC524W22/master/lab/000-cleaning/000-slides.Rmd)
 
-**001 - Data cleaning: Multiple mutations**
+[**001 - Data cleaning: Multiple mutations**](https://raw.githack.com/edrubin/EC524W22/master/lab/001-cleaning/000-markdown.html)
+
 
 1. Finish previous lab on `dplyr`
 2. Working with projects
