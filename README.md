@@ -185,8 +185,7 @@ Approximate/planned topics...
 
 1. Finish previous lab on `dplyr`
 2. Working with projects
-3. Housing data
-    -[data](lab/001-cleaning/data/house-prices-advanced-regression-techniques.zip)
+3. Housing data [download](https://github.com/edrubin/EC524W22/raw/master/lab/001-cleaning/data/house-prices-advanced-regression-techniques.zip)
 4. Extending `dplyr` and `mutate`
 
 **002 - Validation**
