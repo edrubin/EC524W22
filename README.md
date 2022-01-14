@@ -172,7 +172,7 @@ Planned projects
 
 Approximate/planned topics...
 
-[**000 - Workflow and cleaning**](https://raw.githack.com/edrubin/EC524W22/master/lab/000-cleaning/000-slides.html)
+[**000 - Workflow and cleaning 00**](https://raw.githack.com/edrubin/EC524W22/master/lab/000-cleaning/000-slides.html)
 
 1. General "best practices" for coding
 2. Working with RStudio
@@ -181,13 +181,17 @@ Approximate/planned topics...
 
 **Formats** [.html](https://raw.githack.com/edrubin/EC524W22/master/lab/000-cleaning/000-slides.html) | [.pdf](https://raw.githack.com/edrubin/EC524W22/master/lab/000-cleaning/000-slides.pdf) | [.Rmd](https://raw.githack.com/edrubin/EC524W22/master/lab/000-cleaning/000-slides.Rmd)
 
-[**001 - Data cleaning: Multiple mutations**](https://raw.githack.com/edrubin/EC524W22/master/lab/001-cleaning/000-markdown.html)
+[**001 - Workflow and cleaning 01**](https://raw.githack.com/edrubin/EC524W22/master/lab/001-cleaning/001-markdown.html)
 
 
 1. Finish previous lab on `dplyr`
 2. Working with projects
-3. Housing data [download](https://github.com/edrubin/EC524W22/raw/master/lab/001-cleaning/data/house-prices-advanced-regression-techniques.zip)
-4. Extending `dplyr` and `mutate`
+3. Using `dpylr` and `ggplot2` to make insightful visuals
+4. How to fix a coding error
+
+Housing data [download](https://github.com/edrubin/EC524W22/raw/master/lab/001-cleaning/data/house-prices-advanced-regression-techniques.zip)
+
+**Formats** [.html](https://raw.githack.com/edrubin/EC524W22/master/lab/001-cleaning/001-markdown.html) | [.Rmd](https://raw.githack.com/edrubin/EC524W22/master/lab/001-cleaning/001-markdown.Rmd)
 
 **002 - Validation**
 
