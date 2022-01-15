@@ -172,7 +172,7 @@ Planned projects
 
 Approximate/planned topics...
 
-[**000 - Workflow and cleaning 00**](https://raw.githack.com/edrubin/EC524W22/master/lab/000-cleaning/000-slides.html)
+[**000 - Workflow and cleaning**](https://raw.githack.com/edrubin/EC524W22/master/lab/000-cleaning/000-slides.html)
 
 1. General "best practices" for coding
 2. Working with RStudio
@@ -181,7 +181,7 @@ Approximate/planned topics...
 
 **Formats** [.html](https://raw.githack.com/edrubin/EC524W22/master/lab/000-cleaning/000-slides.html) | [.pdf](https://raw.githack.com/edrubin/EC524W22/master/lab/000-cleaning/000-slides.pdf) | [.Rmd](https://raw.githack.com/edrubin/EC524W22/master/lab/000-cleaning/000-slides.Rmd)
 
-[**001 - Workflow and cleaning 01**](https://raw.githack.com/edrubin/EC524W22/master/lab/001-cleaning/001-markdown.html)
+[**001 - Workflow and cleaning**](https://raw.githack.com/edrubin/EC524W22/master/lab/001-cleaning/001-markdown.html) (continued)
 
 
 1. Finish previous lab on `dplyr`
