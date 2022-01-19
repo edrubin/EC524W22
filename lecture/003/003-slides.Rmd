@@ -612,7 +612,7 @@ theme(legend.position = "none")
 .slate[Observation 5's turn for validation produces MSE.sub[5]].
 
 ---
-```{r, plot-loocv-n, echo = F, fig.height = 3, dependson = "data-loocv", cache = T}
+```{r, plot-loocv-n, echo = F, fig.height = 3, dependson = "data-loocv"}
 # The final observation
 ggplot(data = loocv_df, aes(x, y, fill = grp_n, color = grp_n)) +
 geom_point(shape = 21, size = 4.5, stroke = 0.5) +
@@ -938,7 +938,19 @@ layout: false
 
 So far, we've treated each observation as separate/independent from each other observation.
 
-The methods that we've defined so far actually need this independence.
+The methods that we've defined assume this .b.slate[independence].
+
+--
+
+Make sure that you think about
+
+- the .b.slate[structure] of your data
+- the .b.slate[goal] of the prediction exercise
+
+.note[E.g.,]
+
+1. Are you trying to predict the behavior of .b.purple[existing] or .b.pink[new] customers?
+2. Are you trying to predict .b.purple[historical] or .b.pink[future] recessions?
 
 ---
 layout: true

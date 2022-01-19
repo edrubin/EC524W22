@@ -92,12 +92,19 @@ Welcome to Economics 524 (424): Prediction and machine-learning in econometrics,
 - *ISL* Ch5
 - *Optional:* *100ML* Ch5
 
-**004 - Linear regression strikes back**
+[**004 - Linear regression strikes back**](https://raw.githack.com/edrubin/EC524W22/master/lecture/004/004-slides.html)
 
 1. Returning to linear regression
 1. Model performance and overfit
 1. Model selection—best subset and stepwise
 1. Selection criteria
+
+**Formats** [.html](https://raw.githack.com/edrubin/EC524W22/master/lecture/004/004-slides.html) | [.pdf](https://raw.githack.com/edrubin/EC524W22/master/lecture/004/004-slides.pdf) | [.Rmd](https://raw.githack.com/edrubin/EC524W22/master/lecture/004/004-slides.Rmd)
+
+**Readings**
+
+- *ISL* Ch3
+- *ISL* 6.1
 
 **In between: `tidymodels`-ing**
 
