@@ -56,7 +56,7 @@ Welcome to Economics 524 (424): Prediction and machine-learning in econometrics,
 
 **Readings**
 
-- [Prediction Policy Problems](https://www.aeaweb.org/articles?id=10.1257/aer.p20151023) by Kleinberg .it[et al.] (2015)
+- [Prediction Policy Problems](https://www.aeaweb.org/articles?id=10.1257/aer.p20151023) by Kleinberg *et al.* (2015)
 - *ISL* Ch1
 - *ISL* Start Ch2
 
