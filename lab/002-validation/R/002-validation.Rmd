@@ -1,0 +1,294 @@
+---
+title: "Lab 002"
+subtitle: "Cross validation"
+author: "Andrew Dickinson"
+date: </br>`r format(Sys.time(), '%d %B %Y')`
+header-includes:
+  - \usepackage{mathtools}
+  - \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+  - \usepackage{amssymb}
+output: 
+  html_document:
+    toc: false
+    toc_depth: 3  
+    number_sections: false
+    theme: flatly
+    highlight: pygments  
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+---
+
+```{r setup, include=FALSE}
+## These next lines set the default behavior for all R chunks in the .Rmd document.
+## I recommend you take a look here: https://rmarkdown.rstudio.com/authoring_rcodechunks.html
+knitr::opts_chunk$set(echo = TRUE) ## Show all R output
+knitr::opts_chunk$set(cache = FALSE) ## Cache the results to increase performance.
+knitr::opts_chunk$set(warning = FALSE) ## Limit warnings
+knitr::opts_chunk$set(message = FALSE) ## Limit warnings
+```
+
+## Introduction
+
+In this document, we are going to code up some resampling functions that will help us better understand cross validation. Please open an R script on your computer and code up a script while following along. 
+
+To start, make sure to put some thought into where you work on this script. I'd recommend either
+
+- Creating a new project for scripts written in lab; under a "EC524 > lab"
+- Using the same project from last week in project 000
+
+Remember, keeping your computer organized in a methodical way will save your future self time (and pain). Within the project folder, I recommend creating two folders; "R" for your script(s) and "data" for your data. 
+
+## Setup
+
+First things first, lets set setup our scripts properly by installing/loading necessary packages
+
+```{r, echo=TRUE}
+# Setup ----------------------------------------------------------------------------------
+# Options
+options(stringsAsFactors = F)
+# Packages
+# devtools::install_github("tidymodels/parsnip")
+pacman::p_load(
+  tidyverse, data.table, broom, parallel, here, plotly
+)
+```
+
+__Sidebar:__ [`pacman`](https://trinker.github.io/pacman/vignettes/Introduction_to_pacman.html) is a great package for setting up your scripts/markdown docs/slides etc. It is what we would call a _package manager_. A simplified way of organizing the packages we install on our system and load into memory. Very conveniently installs any packages that are not previously installed.
+
+- Anyone here ever use [Arch linux?](https://wiki.archlinux.org/)
+  - `pacman` is the standard package manager for arch; inspiration for the name.. I think..
+  
+__Sidebar _sidebar:___ If you ever start using a new package, or if you want to understand how a specific function from a specific package works, try to google the package's __vignette__.
+
+A vignette is typically a markdown document that is written by the package maintainers that explains the functionality of a package and its functions through a series of examples. Kind of like a set of lecture notes for the package. However, not every package has a vignette.
+
+Here is a list of a few of my favorite vignettes:
+
+- [`fixest`](https://cran.r-project.org/web/packages/fixest/vignettes/fixest_walkthrough.html)
+- [`sf`](https://cran.r-project.org/web/packages/sf/vignettes/sf1.html)
+- [`lubridate`](https://cran.r-project.org/web/packages/lubridate/vignettes/lubridate.html)
+- [`data.table`](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html)
+- [`broom`](https://cran.r-project.org/web/packages/broom/vignettes/broom.html)
+
+Typically, when I am searching for a vignette on Google/DuckDuckGo, I use the following search criteria
+
+- "`R package name` vignette R"
+
+Additionally you can search up the package on [CRAN](https://cran.r-project.org/web/packages/available_packages_by_name.html#available-packages-B). Once you find the CRAN package page, usually any official vignettes will be linked there.
+
+Finally you can search vignettes on the `RStudio` console using the `browseVignettes()` function from the `utils` package. 
+
+```{r}
+# browseVignettes(package = 'pacman')
+```
+
+- I always forget that this function `r emo::ji('call me hand')`
+
+__Back to resampling methods__
+
+Now load the housing data set that we've be using. Click [here](https://github.com/edrubin/EC524W22/raw/master/lab/001-cleaning/data/house-prices-advanced-regression-techniques.zip) to download a zip file; download it to your data folder in which ever project you are using and unzip.
+
+```{r}
+# Load data ------------------------------------------------------------------------------
+# Training data
+train_dt = here('data', 'train.csv') %>% fread()
+# Testing data
+test_dt = here('data', 'test.csv') %>% fread()
+```
+
+We only need a subset of these data for this lab. Let's trim down our data set to four columns: 
+
+- `id`, the house `Id`
+- `sale_price`, the sale price of the house aka `SalePrice`
+- `age`, the age of the house at the time of the sale (the difference between `YrSold` and `YrBuilt`
+- `area`, the non-basement square-foot area of the house
+
+We can do this in a few different ways but `dplyr::transmute()` is a very convenient function to use here
+
+```{r}
+# Generate the new columns and keep only what we want
+house_df = train_dt %>% transmute(
+    id = Id,
+    sale_price = SalePrice / 10000,
+    age = YrSold - YearBuilt,
+    area = GrLivArea
+)
+```
+
+It's always a good idea to look at the new dataframe and make sure it is exactly what we expect it to be. Any of the following is a great way to check:
+
+```{r}
+# Double check the new data set using any of the following functions
+summary(house_df)
+# glimpse(house_df)
+# skimr::skim(house_df)
+# View(house_df)
+```
+
+Finally, since we are going to use some [RNG](https://en.wikipedia.org/wiki/Random_number_generation) the last thing we need to do before our project is setup and ready to go is set a randomization seed using the `set.seed()` function. Setting a seed allows us to keep track of randomness we introduce. By using the same seed, we should be able to reproduce the same result each time we run our code.
+
+Just pick any number. For fun, us your birthday (Ex. "20210624" for 06-24-2021). For simplicity I will use "1234".
+
+```{r}
+# Set seed
+set.seed(1234)
+```
+
+
+## Create a validation set
+
+Let's start by creating a single validation set composed of 30% of our training data. Since we have already set our `seed`, we can draw the validation sample randomly using the `dplyr` function `sample_frac()`. The argument `size` will allow us to choose the desired sample of 30%.
+
+`dplyr`'s function `setdiff()` will give us the remaining, non-validation observation from the original training data.
+
+```{r}
+# Draw validation set
+validation_df = house_df %>% sample_frac(size = 0.3)
+# Find remaining training set
+training_df = setdiff(house_df, validation_df)
+```
+
+If you would like to read more into these functions, remember to look at the help files using `?sample_frac()` and `?setdiff()`.
+
+Finally, let's check our work and make sure the `training_df` + `validation_df` = `house_df`
+
+```{r}
+# Check that dimensions make sense
+nrow(house_df) == nrow(validation_df) + nrow(training_df)
+```
+
+ ## Model fit
+ 
+ Now that we have a training and validation set, let's 
+ 
+ - (i.) Train a regression model with various degrees of flexibility
+ - (ii.) Calculate MSE on the `training_df`
+ - (iii.) Determine which degree of flexibility minimizes validation MSE
+ 
+ Let's define a flexible linear regression model (ie step i.)
+ 
+ - I totally stole this regression specification from the previous set of notes!
+ 
+\begin{align*}
+Price_i = &\beta_0 + \beta_1 * age_i^2 + \beta_2 * age_i + \beta_3 * area_i^2 +  \\ 
+          &\beta_4 * area_i + \beta_5 * age_i^2 \cdot area_i^2 + \beta_6 * age_i^2 \cdot area_i + \\
+          & \beta_7 * age_i \cdot area_i^2 + beta_8 * area_i \cdot age_i
+\end{align*}
+
+Since we want to perform this ^ algorithm (steps i., ii., iii.) several times over, it makes sense to automate this using a function. Doing this will allow us to validate tens, hundreds, thousands etc. of samples very quickly by throwing it into a `for loop`.
+
+```{r}
+# Our model-fit function
+fit_model = function(deg_age, deg_area) {
+    # Estimate the model using the training data
+    est_model = lm(
+      sale_price ~ poly(age, deg_age, raw = T) * poly(area, deg_area, raw = T),
+      data = training_df
+    )
+    # Make predictions on the validation data
+    y_hat = predict(est_model, newdata = validation_df, se.fit = F)
+    # Calculate our validation MSE
+    mse = mean((validation_df$sale_price - y_hat)^2)
+    
+    return(mse)
+}
+```
+
+The two arguments for this function are `deg_age` and `deg_area`. They represent the degree of polynomial for age and area that we want to fit our model (ie  `deg_age = 2` >> $age^2$)
+
+We would like to loop over a series of values for `deg_age` and `deg_area`, fitting a model to each of the polynomial degrees.
+
+First let's create a dataframe that is 2 by 4x6 using the `expand_grid()` function. We will attach each model fit MSE to an additional column.
+
+```{r}
+# Take all possible combinations of our degrees
+deg_df = expand_grid(deg_age = 1:6, deg_area = 1:4)
+```
+
+Now let's iterate over all possible combinations (4x6) of polynomial specifications and see which model fit produces the smallest MSE.
+
+```{r}
+# Iterate over set of possibilities (returns a vector of validation-set MSEs)
+#Note: for Windows machines, can't use mc.cores > 1.  Windows users can also use mapply function
+mse_v = mcmapply(
+    FUN = fit_model,
+    deg_age = deg_df$deg_age,
+    deg_area = deg_df$deg_area,
+    mc.cores = 4
+)
+```
+
+Now that we have a 1 by 24 length vector of all possible polynomial combinations, lets attach this vector as an additional column to the `deg_df` dataframe we assigned a moment ago and arrange by the smalled MSE parameter.
+
+```{r}
+# Add validation-set MSEs to 'deg_df'
+deg_df$mse_v = mse_v
+# Which set of parameters minimizes validation-set MSE?
+arrange(deg_df, mse_v)
+```
+
+```{r, eval=FALSE, echo=FALSE}
+# Plot
+ggplot(data = deg_df, aes(x = deg_age, y = deg_area, fill = log(mse_v))) +
+  geom_tile() +
+  # scale_fill_viridis_c("Logged MSE", option = "plasma", begin = 0.1) +
+  hrbrthemes::theme_ipsum(base_size = 12) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  labs(
+    title = 'Model fit MSE heat map',
+    x = "Degrees of age",
+    y = 'Degrees of area',
+    colour = 'Log of MSE')
+```
+
+Now let's plot it using `ggplot2`, `geom_tile()` and for extra flair/analysis `plotly` an interactive `ggplot2` graphing library.
+
+```{r, fig.height=6, fig.width=9.5}
+#If using RStudio, can run ggplotly to get a more interactive plot:
+mse_gg = ggplot(data = deg_df, aes(x = deg_age, y = deg_area, fill = log(mse_v))) +
+  geom_tile() +
+  # scale_fill_viridis_c("Logged MSE", option = "inferno", begin = 0.1) +
+  hrbrthemes::theme_ipsum(base_size = 12) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  labs(
+    title = 'Model fit MSE heat map',
+    x = "Degrees of age",
+    y = 'Degrees of area',
+    colour = 'Log of MSE')
+
+ggplotly(mse_gg)
+```
+
+## Next week
+
+Next week, we are going to build on this. But instead of (just) automating the model specification, we are going to automate sample selection. My current plan is to show how to do leave-one-out and k-fold cross validation. 
+
+Also we used a little parallel computing today. Next week, it may become much more useful and we can talk about parallel computing and why it is useful
+
+Hopefully that lesson coincides nicely with the second project. I will definitely take some time to go over tips/typical coding errors for that assignment
+
+Finally, a general tip: __Start the next project early! Send me your questions and I will try my best to help (and tell you when I can't help). Any common errors or misunderstandings I will try to go over in next weeks lecture.
+
+Have a great weekend!!
+
+## Acknowledgement
+
+__This document is built upon notes created by a previous GE for this course Stephen Reed which you can find [here](https://www.kaggle.com/stephenreed/ec524-lecture-003/notebook?scriptVersionId=52430728)__
+
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
