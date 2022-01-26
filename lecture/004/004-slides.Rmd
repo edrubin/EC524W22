@@ -86,8 +86,7 @@ name: admin-soon
 
 .b[Problem sets]
 
-- How did it go?
-- .it[Next:] Soon!
+- .it[Next one:] Soon! Possibly the next few days?
 
 ---
 name: admin-roadmap
