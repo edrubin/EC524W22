@@ -104,7 +104,7 @@ Welcome to Economics 524 (424): Prediction and machine-learning in econometrics,
 **Readings**
 
 - *ISL* Ch3
-- *ISL* 6.1
+- *ISL* Ch6.1
 
 **In between: `tidymodels`-ing**
 
@@ -120,6 +120,11 @@ Welcome to Economics 524 (424): Prediction and machine-learning in econometrics,
 1. Ridge regression
 1. Lasso
 1. Elasticnet
+
+**Readings**
+
+- *ISL* Ch4
+- *ISL* Ch6
 
 **006 - Classification intro**
 
