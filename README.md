@@ -164,7 +164,7 @@ Planned projects
 - [A simple example/walkthrough](https://www.kaggle.com/edwardarubin/project-000-example)
 - [Kaggle notebooks](https://rpubs.com/Clennon/KagNotes) (from Connor Lennon)
 
-**001** Validation and out-of-sample performance
+**001** [Validation and out-of-sample performance](https://github.com/edrubin/EC524W22/tree/master/projects/project-001)
 
 **002** Cross validation, penalized regression, and `tidymodels`
 
@@ -194,7 +194,6 @@ Approximate/planned topics...
 **Formats** [.html](https://raw.githack.com/edrubin/EC524W22/master/lab/000-cleaning/000-slides.html) | [.pdf](https://raw.githack.com/edrubin/EC524W22/master/lab/000-cleaning/000-slides.pdf) | [.Rmd](https://raw.githack.com/edrubin/EC524W22/master/lab/000-cleaning/000-slides.Rmd)
 
 [**001 - Workflow and cleaning**](https://raw.githack.com/edrubin/EC524W22/master/lab/001-cleaning/001-markdown.html) (continued)
-
 
 1. Finish previous lab on `dplyr`
 2. Working with projects
