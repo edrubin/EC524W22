@@ -6,12 +6,8 @@ lecture/007
 lecture/008
 lecture/009
 
-# Temporary holds: In-class projects
-projects/inclass-000
-
 # Temporary holds: Projects
-projects/project-001
-projects/project-002
+projects/past/*
 
 # Project-specific files
 */inclass-000/data*
