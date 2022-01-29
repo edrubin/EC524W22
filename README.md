@@ -212,10 +212,11 @@ Housing data [download](https://github.com/edrubin/EC524W22/raw/master/lab/001-c
 
 **Formats** [.html](https://raw.githack.com/edrubin/EC524W22/master/lab/002-validation/R/002-validation.html) | [.Rmd](https://raw.githack.com/edrubin/EC524W22/master/lab/002-validation/R/002-validation.Rmd)
 
-**003 - Practice using `tidymodels`**
+[**003 - Practice using `tidymodels`**](https://www.kaggle.com/edwardarubin/intro-tidymodels-preprocessing)
 
 1. Cleaning data quickly and efficiently with `tidymodels`
-2. R-script used in the lab
+
+**Formats** [.html](https://www.kaggle.com/edwardarubin/intro-tidymodels-preprocessing)
 
 **004 - Ridge, Lasso and Elasticnet Regressions in `tidymodels`**
 
