@@ -2,7 +2,7 @@
 
 In this project, we will to try to predict which party 'won' (received the most votes) for each county in the US during the presidential election of 2016.
 
-All the data you will need are stored in [`election-2016.csv`](https://raw.githack.com/edrubin/EC524W22/master/projects/001/election-2016.csv).
+All the data you will need are stored in [`election-2016.csv`](https://raw.githack.com/edrubin/EC524W22/master/projects/project-001/election-2016.csv).
 
 *Sources:* This dataset combines data from 
 
