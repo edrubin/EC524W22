@@ -286,6 +286,8 @@ fit_dt = mclapply(X = seq(1, p, by = 5), mc.cores = 12, FUN = function(j) {
     in_rse = summary(lm_j)$sigma,
     in_r2 = summary(lm_j)$r.squared,
     in_r2_adj = summary(lm_j)$adj.r.squared,
+    in_aic = AIC(lm_j),
+    in_bic = BIC(lm_j),
     out_rse = sqrt(1 / (Nn - j - 1) * out_rss),
     out_r2 = 1 - out_rss/out_tss,
     out_r2_adj = 1 - ((out_rss) / (Nn - j - 1)) / ((out_tss) / (Nn-1))
@@ -462,6 +464,27 @@ scale_y_continuous(Adjusted~R^2) +
 scale_x_continuous("Number of predictors", labels = comma) +
 theme_minimal(base_size = 20, base_family = "Fira Sans Book")
 ```
+
+---
+
+Here are .b[in-sample] .b.orange[AIC] and .b.purple[BIC].
+<br>
+Neither in-sample metric seems to entirely guard against overfitting.
+
+```{r, test, echo = F, fig.height = 6}
+ggplot(data = fit_dt, aes(x = p, y = in_aic)) +
+geom_hline(yintercept = 0) +
+geom_line() +
+geom_point() +
+geom_line(aes(y = in_aic), color = orange) +
+geom_point(aes(y = in_aic), color = orange) +
+geom_line(aes(y = in_bic), color = purple) +
+geom_point(aes(y = in_bic), color = purple) +
+scale_y_continuous('AIC and BIC') +
+scale_x_continuous('Number of predictors', labels = comma) +
+theme_minimal(base_size = 20, base_family = 'Fira Sans Book')
+```
+
 
 ---
 layout: true

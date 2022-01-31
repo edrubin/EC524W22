@@ -113,13 +113,15 @@ Welcome to Economics 524 (424): Prediction and machine-learning in econometrics,
 - [An introduction to resampling, model tuning, and workflows with `tidymodels`](https://www.kaggle.com/edwardarubin/intro-tidymodels-resampling) (Kaggle notebook)
 - [Introduction to `tidymodels`: Follow up for Kaggle](https://www.kaggle.com/edwardarubin/intro-tidymodels-split-kaggle)
 
-**005 - Shrinkage methods**
+[**005 - Shrinkage methods**](https://raw.githack.com/edrubin/EC524W22/master/lecture/005/005-slides.html)
 
 (AKA: Penalized or regularized regression)
 
 1. Ridge regression
 1. Lasso
 1. Elasticnet
+
+**Formats** [.html](https://raw.githack.com/edrubin/EC524W22/master/lecture/005/005-slides.html) | [.pdf](https://raw.githack.com/edrubin/EC524W22/master/lecture/005/005-slides.pdf) | [.Rmd](https://raw.githack.com/edrubin/EC524W22/master/lecture/005/005-slides.Rmd)
 
 **Readings**
 
