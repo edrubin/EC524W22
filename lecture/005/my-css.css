@@ -462,3 +462,10 @@ hr, .title-slide h2::after, .mline h1::after {
   color: #e5e5e5;
   height: 1px;
 }
+
+/* To print pauses */
+@media print {
+  .has-continuation {
+    display: block !important;
+  }
+}

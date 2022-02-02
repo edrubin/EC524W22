@@ -4,10 +4,12 @@
     <title>Lecture .mono[005]</title>
     <meta charset="utf-8" />
     <meta name="author" content="Edward Rubin" />
-    <script src="005-slides_files/header-attrs-2.11/header-attrs.js"></script>
     <link href="005-slides_files/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="005-slides_files/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
     <link href="005-slides_files/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link href="005-slides_files/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="005-slides_files/tile-view-0.2.6/tile-view.js"></script>
+    <script src="005-slides_files/xaringanExtra_fit-screen-0.2.6/fit-screen.js"></script>
     <link rel="stylesheet" href="my-css.css" type="text/css" />
   </head>
   <body>
@@ -24,12 +26,14 @@ class: center, middle, inverse, title-slide
 exclude: true
 
 
+
 ---
 layout: true
 # Admin
 
 ---
 class: inverse, middle
+
 ---
 name: admin-today
 ## Material
@@ -56,6 +60,7 @@ name: admin-soon
 - .note[Next] .it[ISL] 4
 
 .b[Problem sets] .it[Next problem set:] Available!
+
 ---
 layout: true
 # Shrinkage methods
@@ -90,7 +95,7 @@ These methods assume we need to choose a model before we fit it...
 name: shrinkage-why
 ## Why?
 
-.qa[Q] How could shrinking coefficients twoard zero help or predictions?
+.qa[Q] How could shrinking coefficients toward zero help our predictions?
 
 --
 
@@ -221,6 +226,7 @@ Choosing a .it[good] value for `\(\lambda\)` is key.
 - At `\(\beta = 10\)`, the penalty for a small increase is `\(20\lambda\)`.
 
 Now you see why we call it .it[shrinkage]: it encourages small coefficients.
+
 ---
 name: standardization
 ## Penalization and standardization
@@ -345,6 +351,7 @@ class: clear, middle
 
 .b[Ridge regression coefficents] for `\(\lambda\)` between 0.01 and 100,000
 &lt;img src="005-slides_files/figure-html/plot-ridge-glmnet-1.svg" style="display: block; margin: auto;" /&gt;
+
 ---
 layout: true
 # Ridge regression
@@ -626,6 +633,7 @@ class: clear, middle
 
 .b[Ridge regression coefficents] for `\(\lambda\)` between 0.01 and 100,000
 &lt;img src="005-slides_files/figure-html/plot-ridge-glmnet-2-1.svg" style="display: block; margin: auto;" /&gt;
+
 ---
 # Lasso
 ## Example
@@ -648,6 +656,7 @@ lasso_cv = cv.glmnet(
   nfolds = 5
 )
 ```
+
 ---
 layout: false
 class: clear, middle
@@ -655,6 +664,7 @@ class: clear, middle
 .b[Cross-validated RMSE and] `\(\lambda\)`: Which `\(\color{#8AA19E}{\lambda}\)` minimizes CV RMSE?
 
 &lt;img src="005-slides_files/figure-html/plot-cv-lasso-1.svg" style="display: block; margin: auto;" /&gt;
+
 ---
 class: clear, middle
 
@@ -872,8 +882,6 @@ These notes draw upon
 
 ---
 exclude: true
-
-
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

@@ -53,13 +53,17 @@ options(device = function(file, width, height) {
   svg(tempfile(), width = width, height = height)
 })
 options(knitr.table.format = "html")
+# A few extras
+xaringanExtra::use_xaringan_extra(c("tile_view", "fit_screen"))
 ```
+
 ---
 layout: true
 # Admin
 
 ---
 class: inverse, middle
+
 ---
 name: admin-today
 ## Material
@@ -86,6 +90,7 @@ name: admin-soon
 - .note[Next] .it[ISL] 4
 
 .b[Problem sets] .it[Next problem set:] Available!
+
 ---
 layout: true
 # Shrinkage methods
@@ -120,7 +125,7 @@ These methods assume we need to choose a model before we fit it...
 name: shrinkage-why
 ## Why?
 
-.qa[Q] How could shrinking coefficients twoard zero help or predictions?
+.qa[Q] How could shrinking coefficients toward zero help our predictions?
 
 --
 
@@ -251,6 +256,7 @@ Choosing a .it[good] value for $\lambda$ is key.
 - At $\beta = 10$, the penalty for a small increase is $20\lambda$.
 
 Now you see why we call it .it[shrinkage]: it encourages small coefficients.
+
 ---
 name: standardization
 ## Penalization and standardization
@@ -392,6 +398,7 @@ scale_color_viridis_d("Predictor", option = "magma", end = 0.9) +
 theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
 theme(legend.position = "bottom")
 ```
+
 ---
 layout: true
 # Ridge regression
@@ -780,6 +787,7 @@ scale_color_viridis_d("Predictor", option = "magma", end = 0.9) +
 theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
 theme(legend.position = "bottom")
 ```
+
 ---
 # Lasso
 ## Example
@@ -801,6 +809,7 @@ lasso_cv = cv.glmnet(
   nfolds = 5
 )
 ```
+
 ---
 layout: false
 class: clear, middle
@@ -833,6 +842,7 @@ scale_x_continuous(
 ) +
 theme_minimal(base_size = 20, base_family = "Fira Sans Book")
 ```
+
 ---
 class: clear, middle
 
@@ -1089,8 +1099,5 @@ These notes draw upon
 exclude: true
 
 ```{r, create pdfs, eval = F, include = F}
-pagedown::chrome_print(
-  "005-slides.html",
-  timeout = 60
-)
+pagedown::chrome_print("005-slides.html", timeout = 60)
 ```
