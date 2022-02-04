@@ -225,10 +225,11 @@ Housing data [download](https://github.com/edrubin/EC524W22/raw/master/lab/001-c
 
 **Formats** [.html](https://www.kaggle.com/edwardarubin/intro-tidymodels-preprocessing)
 
-**004 - Ridge, Lasso and Elasticnet Regressions in `tidymodels`**
+[**004 - Practice using `tidymodels`**](https://www.kaggle.com/edwardarubin/intro-tidymodels-preprocessing) (continued)
 
-1. Ridge, Lasso and Elasticnet regressions in `tidymodels` from start to finish with a new dataset.
-2. Using the best model to then predict onto a test dataset.
+1. [An introduction to preprocessing with `tidymodels`](https://www.kaggle.com/edwardarubin/intro-tidymodels-preprocessing) (refresher from last week) 
+2. [An introduction to modeling with `tidymodels`](https://www.kaggle.com/edwardarubin/intro-tidymodels-modeling)
+3. [An introduction to resampling, model tuning, and workflows with `tidymodels`](https://www.kaggle.com/edwardarubin/intro-tidymodels-resampling) (will finish up next week)
 
 **005 - Forcing splits in `tidymodels` and penalized regression**
 
