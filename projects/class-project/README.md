@@ -18,11 +18,11 @@
 
 ## Materials due
 
-Your topic and group are due by the end of the day on **February 25th**.
+Your topic and group are due by the end of the day on **February 16th**.
 
-By midnight on **March 10th**, submit on Canvas (share links or upload files):
+By midnight on **March 9th**, submit **four documents** on Canvas (share links or upload files):
 
-1. Kaggle notebook with (commented) analysis code and figures
+1. Kaggle (or RMD) notebook with commented analysis code and figures
 1. 1-page "executive summary" (see below for format)
 1. 4-slide summary following paragraphs 2–5 of the executive summary (below)
 1. Evaluation of your group member's contribution (submitted individually)
@@ -81,18 +81,18 @@ Submit a short evaluation of whether you and your group-member equally distribut
 
 | ID | Member 1 | Member 2 | Member 3 | Topic/Title |
 |----|----------|-----------|-----------|-------------|
-| 1  | Owen Jetton |   |   | CO2 emissions from US power plants |
-| 2  | Derek Holste | Austin Turvey | Mason Carhart | Corporate bankruptcy |
-| 3  | Devin Bunch | Claire Field |   | Life expectancy |
-| 4  | Andy Clyde | Asher Paules-Bronet |   | Predicting graduation from TN Star |
-| 5  | Jonas Bowman | Ian Bogley |   | Predicting NBA MVP |
-| 6  | Hunter Pearson | Amy Yang |   | Stock returns |
-| 7  | Matt McCoy | Jonathan Ely |   | Malware detection |
-| 8  | Hongzhou Huang |   |   | PM2.5 in China |
-| 9  | Mingwei Xu |   |   | The price of used cars |
-| 10 | Yuling Wu | Zhichao (Scott) Shan | Pengfei Qin | Wine quality |
-| 11 | Jeffrey Yang | Eric Andersen |   | VIX levels |
-| 12 | Benn Jesser | Joey Schechter |   | EV performance |
-| 13 | Lisa Lindquist |   |   | Bike-share demand |
-| 14 | Kara Krnacik |   |   | Global education |
-| 15 | Tillman Degens |   |   | Box-office revenue |
+| 1  | Zoe Arnaut-Hull | Octavio De Lima | Cyrus Tadjiki |  |
+| 2  |  |  |  |  |
+| 3  |  |  |  |  |
+| 4  |  |  |  |  |
+| 5  |  |  |  |  |
+| 6  |  |  |  |  |
+| 7  |  |  |  |  |
+| 8  |  |  |  |  |
+| 9  |  |  |  |  |
+| 10 |  |  |  |  |
+| 11 |  |  |  |  |
+| 12 |  |  |  |  |
+| 13 |  |  |  |  |
+| 14 |  |  |  |  |
+| 15 |  |  |  |  |
