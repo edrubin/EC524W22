@@ -180,7 +180,7 @@ Planned projects
 
 **001** [Validation and out-of-sample performance](https://github.com/edrubin/EC524W22/tree/master/projects/project-001)
 
-**002** Cross validation, penalized regression, and `tidymodels`
+**002** [Penalized regression, logistic regression, and classification](https://github.com/edrubin/EC524W22/tree/master/projects/project-002)
 
 **003** Nonlinear predictors
 
