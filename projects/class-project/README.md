@@ -22,7 +22,7 @@ Your topic and group are due by the end of the day on **February 16th**.
 
 By midnight on **March 9th**, submit **four documents** on Canvas (share links or upload files):
 
-1. Kaggle (or RMD) notebook with commented analysis code and figures
+1. Kaggle notebook (or [RMarkdown](https://rmarkdown.rstudio.com/lesson-10.html) notebook) with commented analysis code and figures
 1. 1-page "executive summary" (see below for format)
 1. 4-slide summary following paragraphs 2–5 of the executive summary (below)
 1. Evaluation of your group member's contribution (submitted individually)
