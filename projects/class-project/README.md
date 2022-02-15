@@ -83,10 +83,10 @@ Submit a short evaluation of whether you and your group-member equally distribut
 
 | ID | Member 1 | Member 2 | Member 3 | Topic/Title |
 |----|----------|-----------|-----------|-------------|
-| 1  | Zoe Arnaut-Hull | Octavio De Lima | Cyrus Tadjiki |  |
-| 2  |  |  |  |  |
-| 3  |  |  |  |  |
-| 4  |  |  |  |  |
+| 1  | Zoe Arnaut-Hull | Octavio De Lima | Cyrus Tadjiki | Spam emails |
+| 2  | Afnan Alharbi | Ryan Fox | Erin Speltz | EV sales |
+| 3  | Tracy Bishop | Luke Coury |  | El Niño |
+| 4  | Hannah Grubbs | Purushothaman Padmanabhan | Jay Schmidt | Winter Olympics medals |
 | 5  |  |  |  |  |
 | 6  |  |  |  |  |
 | 7  |  |  |  |  |
