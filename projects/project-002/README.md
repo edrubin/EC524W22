@@ -1,4 +1,4 @@
-# Classification, regression, resampling, and validation
+# Penalized regression, logistic regression, and classification
 
 Back to the 2016 election!
 
