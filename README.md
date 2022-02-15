@@ -12,7 +12,7 @@ Welcome to Economics 524 (424): Prediction and machine-learning in econometrics,
 **Office hours**
 
 - **Ed Rubin** Tuesdays, 3:30p–5:00p, [Zoom](https://uoregon.zoom.us/j/99805127132?pwd=NzROS2hCY0ljSGc4SXFOY3RvYm1SUT09)
-- **Andrew Dicknson** Thursdays, 2:00p-3:00p, [Zoom](https://uoregon.zoom.us/j/6669213025)
+- **Andrew Dickinson** Thursdays, 2:00p-3:00p, [Zoom](https://uoregon.zoom.us/j/6669213025)
 
 
 ## Syllabus
