@@ -153,12 +153,18 @@ Welcome to Economics 524 (424): Prediction and machine-learning in econometrics,
 
 - *ISL* Ch8.1–Ch8.2
 
-**008 - Ensemble methods**
+[**008 - Ensemble methods**](https://raw.githack.com/edrubin/EC524W21/master/lecture/008/008-slides.html)
 
 1. Introduction
 1. Bagging
 1. Random forests
 1. Boosting
+
+**Formats** [.html](https://raw.githack.com/edrubin/EC524W21/master/lecture/008/008-slides.html) | [.pdf](https://raw.githack.com/edrubin/EC524W21/master/lecture/008/008-slides.pdf) | [.Rmd](https://raw.githack.com/edrubin/EC524W21/master/lecture/008/008-slides.Rmd)
+
+**Readings**
+
+- *ISL* Ch8.2
 
 **009 - Support vector machines**
 
@@ -166,6 +172,10 @@ Welcome to Economics 524 (424): Prediction and machine-learning in econometrics,
 2. The maximal margin hyperplane/classifier
 3. The support vector classifier
 4. Support vector machines
+
+**Readings**
+
+- *ISL* Ch9
 
 ## Projects
 

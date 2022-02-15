@@ -1163,10 +1163,11 @@ best_flow =
   fit(data = default_df)
 ```
 
-2\. .b.purple[Extract] the fitted model, *e.g.*, with `pull_workflow_fit()`.
+2\. .b.purple[Extract] the fitted model, *e.g.*, with `extract_fit_parsnip`.
+<br> .note[Old/deprecated way:] `pull_workflow_fit()`
 
 ```{r, plot-tree-2}
-best_tree = best_flow %>% pull_workflow_fit()
+best_tree = best_flow %>% extract_fit_parsnip()
 ```
 
 3\. .b.orange[Plot] the tree, *e.g.*, with `rpart.plot()` from `rpart.plot`.
@@ -1414,5 +1415,5 @@ These notes draw upon
 ]
 
 ```{r, create pdfs, eval = F, include = F}
-pagedown::chrome_print("007-slides.html", timeout = 60)
+pagedown::chrome_print("007-slides.html", timeout = 300, wait = 4)
 ```

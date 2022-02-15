@@ -616,7 +616,6 @@ class: clear
 layout: true
 # Decision trees
 
-
 ---
 name: class-why
 ## Rational
@@ -741,11 +740,12 @@ best_flow =
   fit(data = default_df)
 ```
 
-2\. .b.purple[Extract] the fitted model, *e.g.*, with `pull_workflow_fit()`.
+2\. .b.purple[Extract] the fitted model, *e.g.*, with `extract_fit_parsnip`.
+&lt;br&gt; .note[Old/deprecated way:] `pull_workflow_fit()`
 
 
 ```r
-best_tree = best_flow %&gt;% pull_workflow_fit()
+best_tree = best_flow %&gt;% extract_fit_parsnip()
 ```
 
 3\. .b.orange[Plot] the tree, *e.g.*, with `rpart.plot()` from `rpart.plot`.
@@ -924,6 +924,8 @@ These notes draw upon
 - [Sources/references](#sources)
 ]
 ]
+
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
