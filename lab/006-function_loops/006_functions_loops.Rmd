@@ -1,0 +1,204 @@
+---
+title: "Functions and loops"
+author: "Andrew Dickinson"
+date: </br>`r format(Sys.time(), '%d %B %Y')`
+output:
+  html_document:
+    toc: yes
+    toc_depth: 5
+    number_sections: no
+    theme: flatly
+    highlight: tango
+    toc_float:
+      collapsed: yes
+      smooth_scroll: yes
+  pdf_document:
+    toc: no
+    toc_depth: '5'
+header-includes:
+- \usepackage{mathtools}
+- \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+- \usepackage{amssymb}
+---
+
+```{r}
+pacman::p_load(tidyverse, data.table, purrr)
+```
+
+
+## Acknowledgement
+
+This set of notes is a total rip of Grant McDermotts lecture notes on functions [here](https://raw.githack.com/uo-ec607/lectures/master/10-funcs-intro/10-funcs-intro.html#Basic_syntax). I don't want to take any credit here. I wrote this up to get at the core ideas that are best to start with. If you would like to learn more, you can go through Grant's entire Data Science for Economist (PhD) lecture notes on this [GitHub repo](https://github.com/uo-ec607/lectures)
+
+## Functions
+
+Basic function syntax
+
+```{r, eval=FALSE}
+function_name(ARGUMENTS)
+```
+
+This syntax is `R` coding in a nutshell. Most of the time, all we are writing is variations of this syntax.
+
+However, sometimes writing our own functions can be __extremely__ useful. This is easy to do using the `function()` function (i know lol).
+
+The basic sytax of `function()`
+
+```{r}
+my_func = function(ARGUMENTS) {
+  OPERATIONS
+  return(VALUE)
+}
+```
+
+#### Simple example: `square(x)`
+
+Write a function that outputs the square of any number
+
+```{r}
+square = function(x) {  # name of the function
+  double = x^2          # operation
+  return(double)        # output we want returned
+}
+```
+
+Test it
+
+```{r}
+square(3)
+```
+
+_Note: We can write this function is several different ways. Generally I follow the above format; explicitly using `return()`_
+
+#### Default arguments
+
+```{r}
+square = function(x = 2) {  # name of the function
+  double = x^2          # operation
+  return(double)        # output we want returned
+}
+```
+
+Thus without an input, the function will return the dfault
+
+```{r}
+square()
+```
+
+#### Control flow
+
+```{r}
+square = function(x = 2) {
+  if (class(x) == 'numeric' | class(x) == 'integer') {
+    double = x^2
+    return(double)
+  }
+  else {
+    print('put in a number you dummy')
+  }
+}
+```
+
+## Loops
+
+Now lets iterate
+
+Like I mentioned in class last time, there are several ways to write a loops in `R`
+
+- `for () {}`
+- `*apply` family from `base`
+- `map*` family from `purrr` 
+
+#### `for` loops
+
+The standard for loop syntax is similar to other dynamic programming languages:
+
+```{r}
+# create and empty (list) object
+square_list = NULL
+# for loop
+for (i in 1:10) {       ## state your index
+  square_list[i] = square(i)   ## state the function you would like to loop over
+}
+```
+
+Let's check out the `base::LETTERS()` function
+
+```{r}
+for (i in 1:10) {
+  print(LETTERS[i])
+}
+```
+
+#### `lapply`
+
+I'm only going to go over `lapply` from the `apply*` family. If you want to learn about the whole family--see `?apply` and/or [this blog](https://nsaunders.wordpress.com/2010/08/20/a-brief-introduction-to-apply-in-r/)
+
+The syntax for the same two loops above is as follows:
+
+```{r}
+lapply(1:10, function(i){
+  square(i)
+})
+```
+
+```{r}
+lapply(1:10, function(i){
+  print(LETTERS[i])
+})
+```
+
+
+Notice that the returned object is a list.. This is where the `l` in `lapply` comes from. If you would like a more `s`implified output, use `sapply`--it will match the input type.
+
+```{r}
+sapply(1:10, function(i){
+  square(i)
+})
+```
+
+#### `map`
+
+We'll get to map another day lols
+
+Basically the syntax is the same, but there are some differences that we will talk about next time. The same two loops as before can be written as
+
+```{r}
+map(1:10, function(i){
+  square(i)
+})
+```
+
+and
+
+```{r}
+map(1:10, function(i){
+  print(LETTERS[i])
+})
+```
+
+
+## Task
+
+With this simple introduction, we can already make some serious improvements to our workflow. Let's go back to project 001 for a minute. When we want to perform k-fold cross validation, loops can make our code __much__ cleaner. 
+
+Recall the useful functions that we used in project 002:
+
+- `sample_frac()`, or `sample_n()` or `sample()`
+- `setdiff()`
+- `lm()`
+- `predict()`
+
+__Task:__
+
+(i.) Load the `election_2016.csv` data into memory
+
+(ii.) From part 1, create a function that automates the subparts 03 and 04--outputing a `rmse` for 3 different models. The arguments of the function should include `function(data)`
+
+(iii.) Now make the function more general by allowing it to flexibly change the `lm` formula. Create a second argument, `function(data, formula)`, where formula is the model you want the function to use.
+
+(iv.) Write a loop over all three formulas, returning `rmse` for each model. 
+
+(v.) Now let's generalize your function to add cross validation. Add a third argument, `function(data, formula, v)`, where `v` is the group you want to omit as the validation group.
+ 
+(vi.) Now write a nested (double) loop that loops over (1) each model (2) `v`. Your output should return an `rmse` for each combination of `formula` and `v`
