@@ -247,16 +247,16 @@ Housing data [download](https://github.com/edrubin/EC524W22/raw/master/lab/001-c
 2. [An introduction to modeling with `tidymodels`](https://www.kaggle.com/edwardarubin/intro-tidymodels-modeling)
 3. [An introduction to resampling, model tuning, and workflows with `tidymodels`](https://www.kaggle.com/edwardarubin/intro-tidymodels-resampling) (will finish up next week)
 
-**005 - Forcing splits in `tidymodels` and penalized regression**
+**005 - Summarizing `tidymodels`**
 
 1. Summarizing `tidymodels`
-2.  [Combining pre-split data together and then defining a custom split](https://www.kaggle.com/edwardarubin/intro-tidymodels-split-kaggle)
+2. [Combining pre-split data together and then defining a custom split](https://www.kaggle.com/edwardarubin/intro-tidymodels-split-kaggle)
 
 
-[**006 - Penalized regression in `tidymodels` + functions + loops**](https://raw.githack.com/edrubin/EC524W22/master/lab/006-function_loops/006-function_loops.html)
+[**006 - Penalized regression in `tidymodels` + functions + loops**](https://raw.githack.com/edrubin/EC524W22/master/lab/006-function_loops/006_functions_loops.html)
 
 1. Running a Ridge, Lasso or Elasticnet logistic regression in `tidymodels`.
-2. [A short lesson in writing functions and loops in R (part 01)](https://raw.githack.com/edrubin/EC524W22/master/lab/006-function_loops/006-function_loops.html)
+2. [A short lesson in writing functions and loops in R (part 01)](https://raw.githack.com/edrubin/EC524W22/master/lab/006-function_loops/006_functions_loops.html)
 
 
 ## Additional resources
