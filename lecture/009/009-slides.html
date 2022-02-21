@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Lecture .mono[009]</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Edward Rubin" />
+    <meta name="date" content="2021-02-25" />
+    <link href="009-slides_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="009-slides_files/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="009-slides_files/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="my-css.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Lecture .mono[009]
+## Support vector machines
+### Edward Rubin
+### 25 February 2021
+
+---
+
+exclude: true
+
+
+
+---
+name: admin
+# Admin
+## Today
+
+.b[Topic] Support vector machines
+
+## Upcoming
+
+.b[Readings]
+- .note[Today] .it[ISL] Ch. 9
+- .note[Next] .it[100ML] Ch. [6](https://www.dropbox.com/s/uh48e6wjs4w13t5/Chapter6.pdf?dl=0)
+
+.b[Project] Project updates/questions?
+
+---
+layout: true
+# Support vector machines
+
+---
+class: inverse, middle
+
+---
+name: intro
+## Intro
+
+.attn[Support vector machines] (SVMs) are a .it[general class] of classifiers that essentially attempt to separate two classes of observations.
+
+--
+
+&gt; SVMs have been shown to perform well in a variety of settings, and are often considered one of the best "out of the box" classifiers.
+.grey-light.it[ISL, p. 337]
+
+--
+
+The .attn[support vector machine] generalizes a much simpler classifier—the .attn[maximal margin classifier].
+
+The .attn[maximal margin classifier] attempts to separate the .b[two classes] in our prediction space using .b[a single hyperplane].
+---
+name: hyperplanes
+## What's a hyperplane?
+
+Consider a space with `\(p\)` dimensions.
+
+A .attn[hyperplane] is a `\(p-1\)` dimensional .b[subspace] that is
+
+1. .b[flat] (no curvature)
+1. .b[affine] (may or may not pass through the origin)
+
+--
+
+.ex[Example] In `\(p=1\)` dimension, a .it.pink[hyperplane] is a
+
+&lt;img src="009-slides_files/figure-html/hp-1a-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+## What's a hyperplane?
+
+Consider a space with `\(p\)` dimensions.
+
+A .attn[hyperplane] is a `\(p-1\)` dimensional .b[subspace] that is
+
+1. .b[flat] (no curvature)
+1. .b[affine] (may or may not pass through the origin)
+
+.ex[Example] In `\(p=1\)` dimension, a .it.pink[hyperplane] is a point.
+
+&lt;img src="009-slides_files/figure-html/hp-1b-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+## What's a hyperplane?
+
+Consider a space with `\(p\)` dimensions.
+
+A .attn[hyperplane] is a `\(p-1\)` dimensional .b[subspace] that is
+
+1. .b[flat] (no curvature)
+1. .b[affine] (may or may not pass through the origin)
+
+.ex[Example] In `\(p=2\)` dimensions, a .it.pink[hyperplane] is a
+
+&lt;img src="009-slides_files/figure-html/hp-2a-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+## What's a hyperplane?
+
+Consider a space with `\(p\)` dimensions.
+
+A .attn[hyperplane] is a `\(p-1\)` dimensional .b[subspace] that is
+
+1. .b[flat] (no curvature)
+1. .b[affine] (may or may not pass through the origin)
+
+.ex[Example] In `\(p=2\)` dimensions, a .it.pink[hyperplane] is a line.
+
+&lt;img src="009-slides_files/figure-html/hp-2b-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+## What's a hyperplane?
+
+Consider a space with `\(p\)` dimensions.
+
+A .attn[hyperplane] is a `\(p-1\)` dimensional .b[subspace] that is
+
+1. .b[flat] (no curvature)
+1. .b[affine] (may or may not pass through the origin)
+
+.ex[Example] In `\(p=3\)` dimensions, a .it.pink[hyperplane] is a
+--
+ (2D) plane.
+
+---
+## Hyperplanes
+
+We can define a .attn[hyperplane] in `\(p\)` dimensions by constraining the linear combination of the `\(p\)` dimensions..super[.pink[†]]
+
+.footnote[
+.pink[†] Plus some offset ("intercept")
+&lt;br&gt;.tran[.pink[††] Alternatively: The hyperplane is composed of such points.]
+]
+
+--
+
+For example, in two dimensions a hyperplane is defined by
+$$
+`\begin{align}
+  \beta_0 + \beta_1 X_{1} + \beta_2 X_{2} = 0
+\end{align}`
+$$
+
+which is just the equation for a line.
+
+--
+
+Points `\(X=\left( X_1,\,X_2 \right)\)` that satisfy the equality .it[live] on the hyperplane..super[.pink[††]]
+
+.footnote[
+.tran[.pink[†] Plus some offset ("intercept")]
+&lt;br&gt;.pink[††] Alternatively: The hyperplane is composed of such points.
+]
+
+
+---
+## Separating hyperplanes
+
+More generally, in `\(p\)` dimensions, we defined a hyperplane by
+$$
+`\begin{align}
+  \beta_0 + \beta_1 X_{1} + \beta_2 X_{2} + \cdots + \beta_p X_{p} = 0
+  \tag{A}
+\end{align}`
+$$
+
+If `\(X=\left( X_1,\,X_2,\, \ldots,\, X_p \right)\)` satisfies the equality, it is on the hyperplane.
+
+--
+
+Of course, not every point in the `\(p\)` dimensions will satisfy `\(\text{A}\)`.
+
+- If `\(\beta_0 + \beta_1 X_{1} + \cdots + \beta_p X_{p} &gt; 0\)`, then `\(X\)` is .hi-purple.it[above] the hyperplane.
+
+- If `\(\beta_0 + \beta_1 X_{1} + \cdots + \beta_p X_{p} &lt; 0\)`, then `\(X\)` sits .hi-orange.it[below] the hyperplane.
+
+--
+
+The hyperplane .it[separates] the `\(p\)`-dimensional space into two "halves".
+
+---
+layout: true
+class: clear
+
+---
+exclude: true
+
+
+
+---
+
+.ex[Ex:] A .hi-pink[separating hyperplane] in two dimensions: `\(\color{#e64173}{3 + 2 X_1 - 4 X_2 = 0}\)`
+
+
+&lt;img src="009-slides_files/figure-html/fig-sep-2d-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+exclude: true
+
+
+
+---
+
+.ex[Ex:] A .hi-pink[separating hyperplane] in 3 dimensions: `\(\color{#e64173}{3 + 2 X_1 - 4 X_2 + 2 X_3 = 0}\)`
+
+
+
+&lt;iframe src="fig-sep-3d.html" width="100%" height="600" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"&gt; &lt;/iframe&gt;
+
+---
+layout: true
+# Support vector machines
+
+---
+name: sep-class
+## Separating hyperplanes and classification
+
+.note[Idea:] .it[Separate] two classes of outcomes in the `\(p\)` dimensions of our predictor space using a separating hyperplane.
+
+--
+
+To make a prediction for observation `\((x^o,\,y^o)=(x_1^o,\,x_2^o,\,\ldots,\,x_p^o,\,y^o):\)`
+
+We classify points that live .purple["above" of the plane] as one class, *i.e.*,
+.center[
+If `\(\beta_0 + \beta_1 x^o_{1} + \cdots + \beta_p x^o_{p} \color{#6A5ACD}{&gt; 0}\)`, then `\(\color{#6A5ACD}{\hat{y}^o =}\)` .purple[Class 1]
+]
+
+We classify points .orange["below" the plane] as the other class, *i.e.*,
+.center[
+If `\(\beta_0 + \beta_1 x^o_{1} + \cdots + \beta_p x^o_{p} \color{#FFA500}{&lt; 0}\)`, then `\(\color{#FFA500}{\hat{y}^o =}\)` .orange[Class 2]
+]
+
+--
+
+.note[Note] This strategy assumes a separating hyperplane exists.
+
+---
+exclude: true
+
+
+
+---
+
+.it[If] .hi-pink[a separating hyperplane] exists,
+
+&lt;img src="009-slides_files/figure-html/fig-plane-class-1-1.svg" style="display: block; margin: auto;" /&gt;
+---
+count: false
+
+.it[If] .hi-pink[a separating hyperplane] exists, then it defines a binary classifier.
+
+&lt;img src="009-slides_files/figure-html/fig-plane-class-2-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+.it[If] .hi-pink[a separating hyperplane] exists,
+
+&lt;img src="009-slides_files/figure-html/fig-many-planes-1-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+count: false
+
+.it[If] .hi-pink[a separating hyperplane] exists, then .hi-slate[many separating hyperplanes] exist.
+
+&lt;img src="009-slides_files/figure-html/fig-many-planes-2-1.svg" style="display: block; margin: auto;" /&gt;
+---
+
+A .b[a separating hyperplane] may not exist.
+
+&lt;img src="009-slides_files/figure-html/fig-non-existant-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+## Decisions
+
+.note[Summary] A given hyperplane
+$$
+`\begin{align}
+  \color{#e64173}{\beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_p x_p} = 0
+\end{align}`
+$$
+produces a decision boundary.
+
+
+--
+
+We can determine any point's `\(\left( x^o \right)\)` .it[side] of the boundary.
+$$
+`\begin{align}
+  \mathop{f}\left( x^o \right) =  \color{#e64173}{\beta_0 + \beta_1 x^o_1 + \beta_2 x^o_2 + \cdots + \beta_p x^o_p}
+\end{align}`
+$$
+
+We classify observationg `\(x^o\)` based upon whether `\(\mathop{f}\left( x^o \right)\)` is .purple[positive]/.orange[negative].
+
+The magnitude of `\(\mathop{f}\left( x^o \right)\)` tells us about our .it[confidence] in the classification..super[.pink[†]]
+
+.footnote[
+.pink[†] Larger magnitudes are farther from the boundary.
+]
+
+---
+name: which-hyperplane
+## Which separating hyperplane?
+
+.qa[Q] How do we choose between the possible hyperplanes?
+
+--
+
+.qa[A] .it[One solution:] Choose the separating hyperplane that is "farthest" from the training data points—maximizing "separation."
+
+--
+
+The .attn[maximal margin hyperplane].super[.pink[†]] is the hyperplane that
+
+.footnote[
+.pink[†] AKA the .it[optimal separating hyperplane]
+&lt;br&gt;.tran[.pink[††] The distance to the nearest observation.]
+]
+
+1. .hi[separates] the two classes of obsevations
+1. .hi[maximizes] the .attn[margin]—the distance to the nearest observation.super[.pink[††]]
+
+.footnote[
+.tran[.pink[†] AKA the .it[optimal separating hyperplane]]
+&lt;br&gt;.pink[††] Put differently: The smallest distance to a training observation.
+]
+
+where .it[distance] is a point's perpendicular distance to the hyperplane.
+
+---
+exclude: true
+
+
+
+---
+layout: true
+class: clear
+
+---
+
+The .hi-pink[maximal margin hyperplane]...
+
+&lt;img src="009-slides_files/figure-html/fig-mmh-1-1.svg" style="display: block; margin: auto;" /&gt;
+---
+
+...maximizes the .b.grey[margin] between the hyperplane and training data...
+
+&lt;img src="009-slides_files/figure-html/fig-mmh-2-1.svg" style="display: block; margin: auto;" /&gt;
+---
+
+...and is supported by three equidistant observations—the .b[support vectors].
+
+&lt;img src="009-slides_files/figure-html/fig-mmh-3-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+layout: true
+# Support vector machines
+
+
+---
+## The maximal margin hyperplane
+
+Formally, the .attn[maximal margin hyperplane] solves the problem:
+
+Maximize the margin `\(M\)` over the set of `\(\left\{ \beta_0,\, \beta_1,\, \ldots,\, \beta_p,\, M \right\}\)` such that
+
+--
+
+$$
+`\begin{align}
+   \sum_{j=1}^{p} \beta_j^2 = 1
+   \tag{1}
+\end{align}`
+$$
+
+$$
+`\begin{align}
+  y_i \left( \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip} \right) \ge M
+  \tag{2}
+\end{align}`
+$$
+
+for all observations `\(i\)`.
+
+--
+
+`\((2)\)` Ensures we separate (classify) observations correctly.
+
+--
+
+`\((1)\)` allows us to interpret `\((2)\)` as "distance from the hyperplane".
+
+---
+## Fake constraints
+
+Note that our first "constraint"
+$$
+`\begin{align}
+   \sum_{j=1}^{p} \beta_j^2 = 1
+   \tag{1}
+\end{align}`
+$$
+does not actually constrain `\(-1 \le \beta_j \le 1\)` (or the hyperplane).
+
+--
+
+If we can define a hyperplane by
+$$
+`\begin{align}
+  \beta_0 + \beta_1 x_{i,1} + \beta_2 x_{i,2} + \cdots + \beta_p x_{i,p} = 0
+\end{align}`
+$$
+then we can also rescale the same hyperplane with some constant `\(k\)`
+$$
+`\begin{align}
+  k \left( \beta_0 + \beta_1 x_{i,1} + \beta_2 x_{i,2} + \cdots + \beta_p x_{i,p} \right) = 0
+\end{align}`
+$$
+
+
+---
+## The maximal margin classifier
+
+The maximal margin hyperplane produces the .attn[maximal margin classifier].
+
+--
+
+.note[Notes]
+
+1. We are doing .b[binary classification].
+
+1. The decision boundary only uses the .b[support vectors]—very sensitive.
+
+1. This classifier can struggle in .b[large dimensions] (big `\(p\)`).
+
+1. A separating hyperplane does not always exist (.b[non-separable]).
+
+1. Decision boundaries can be .b[nonlinear].
+
+---
+layout: false
+class: clear, middle
+
+Let's start by addressing non-separability...
+
+---
+class: clear, middle
+
+Surely there's still a decent hyperplane-based classifier here, right?
+
+&lt;img src="009-slides_files/figure-html/fig-non-existant-2-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+---
+layout: true
+# Support vector machines
+
+---
+name: soft-margins
+## Soft margins
+
+When we cannot .it[perfectly] separate our classes, we can use .attn[soft margins], which are margins that "accept" some number of observations.
+
+--
+
+.note[The idea:] We will allow observations to be
+1. in the margin
+2. on the wrong side of the hyperplane
+
+but each will come with a price.
+
+--
+
+Using these .it[soft margins], we create a hyperplane-based classifier called the .attn[support vector classifier]..super[.pink[†]]
+
+.footnote[
+.pink[†] Also called the .it[soft margin classifier].
+]
+
+---
+exclude: true
+
+
+
+
+
+
+
+---
+layout: false
+class: clear
+
+Our underlying population clearly does not have a separating hyperplane.
+
+&lt;img src="009-slides_files/figure-html/fig-nosep-1-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+class: clear
+
+Our sample population also does not have a separating hyperplane.
+
+&lt;img src="009-slides_files/figure-html/fig-nosep-2-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+class: clear
+
+Our .hi[hyperplane]
+
+&lt;img src="009-slides_files/figure-html/fig-nosep-3a-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+class: clear
+
+Our .hi[hyperplane] with .hi-grey[soft margins]...
+
+&lt;img src="009-slides_files/figure-html/fig-nosep-3b-1.svg" style="display: block; margin: auto;" /&gt;
+---
+class: clear
+
+Our .hi[hyperplane] with .hi-grey[soft margins] and .b[support vectors].
+
+&lt;img src="009-slides_files/figure-html/fig-nosep-3c-1.svg" style="display: block; margin: auto;" /&gt;
+---
+class: clear
+
+.b[Support vectors:] on (i) the margin or (ii) on the wrong side of the margin.
+
+&lt;img src="009-slides_files/figure-html/fig-nosep-3d-1.svg" style="display: block; margin: auto;" /&gt;
+---
+layout: true
+# Support vector machines
+## Support vector classifier
+
+---
+name: svc
+
+The .attn[support vector classifier] selects a hyperplane by solving the problem
+
+Maximize the margin `\(M\)` over the set `\(\left\{ \beta_0, \beta_1, \ldots,\beta_p, \epsilon_1, \ldots, \epsilon_n, M  \right\}\)` s.t.
+
+--
+
+$$
+`\begin{align}
+  \sum_{j=1}^{p} \beta_j^2 = 1
+  \tag{3}
+\end{align}`
+$$
+
+--
+
+$$
+`\begin{align}
+  y_i \left( \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip} \right) \ge M \left( 1 - \epsilon_i \right)
+  \tag{4}
+\end{align}`
+$$
+
+--
+
+$$
+`\begin{align}
+  \epsilon_i \ge 0, \quad \sum_{i=1}^{n} \epsilon_i \le C
+  \tag{5}
+\end{align}`
+$$
+
+The `\(\epsilon_i\)` are .attn[slack variables] that allow `\(i\)` to .it[violate] the margin or hyperplane.
+--
+&lt;br&gt;
+`\(C\)` gives is our budget for these violations.
+
+---
+layout: true
+class: clear
+
+---
+class: middle
+
+Let's consider constraints `\((4)\)` and `\((5)\)` work together...
+
+$$
+`\begin{align}
+  y_i \left( \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip} \right) \ge M \left( 1 - \epsilon_i \right)
+  \tag{4}
+\end{align}`
+$$
+
+$$
+`\begin{align}
+  \epsilon_i \ge 0, \quad \sum_{i=1}^{n} \epsilon_i \le C
+  \tag{5}
+\end{align}`
+$$
+
+---
+
+$$
+`\begin{align}
+  \color{#6A5ACD}{y_i} \left( \color{#6A5ACD}{\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip}} \right) \ge M \left( 1 - \color{#e64173}{\epsilon_i} \right),
+  \quad
+  \color{#e64173}{\epsilon_i} \ge 0,
+  \quad
+  \sum_{i=1}^{n} \color{#e64173}{\epsilon_i} \le C
+\end{align}`
+$$
+
+.more-left.move-up-more[
+&lt;img src="009-slides_files/figure-html/plot-slack-1a-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.less-right.move-up[
+For `\(\color{#e64173}{\epsilon_i} = 0:\)`
+
+- `\(M \left( 1 - \color{#e64173}{\epsilon_i} \right) &gt; 0\)`
+- Correct side of hyperplane
+- Correct side of margin &lt;br&gt;(or on margin)
+- No cost `\((C)\)`
+- Distance `\(\ge M\)`
+- .ex[Examples?] `\(\color{#ffffff}{\left( \times \right)}\)`
+]
+---
+
+$$
+`\begin{align}
+  \color{#6A5ACD}{y_i} \left( \color{#6A5ACD}{\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip}} \right) \ge M \left( 1 - \color{#e64173}{\epsilon_i} \right),
+  \quad
+  \color{#e64173}{\epsilon_i} \ge 0,
+  \quad
+  \sum_{i=1}^{n} \color{#e64173}{\epsilon_i} \le C
+\end{align}`
+$$
+
+.more-left.move-up-more[
+&lt;img src="009-slides_files/figure-html/plot-slack-1b-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.less-right.move-up[
+For `\(\color{#e64173}{\epsilon_i} = 0:\)`
+
+- `\(M \left( 1 - \color{#e64173}{\epsilon_i} \right) &gt; 0\)`
+- Correct side of hyperplane
+- Correct side of margin &lt;br&gt;(or on margin)
+- No cost `\((C)\)`
+- Distance `\(\ge M\)`
+- Correct side of margin: `\(\left( \color{#314f4f}{\times} \right)\)`
+- .it[On margin:] .small[.purple[1], .orange[6], .orange[9]]
+]
+
+---
+
+$$
+`\begin{align}
+  \color{#6A5ACD}{y_i} \left( \color{#6A5ACD}{\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip}} \right) \ge M \left( 1 - \color{#e64173}{\epsilon_i} \right),
+  \quad
+  \color{#e64173}{\epsilon_i} \ge 0,
+  \quad
+  \sum_{i=1}^{n} \color{#e64173}{\epsilon_i} \le C
+\end{align}`
+$$
+
+.more-left.move-up-more[
+&lt;img src="009-slides_files/figure-html/plot-slack-2a-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.less-right.move-up[
+For `\(0 \le \color{#e64173}{\epsilon_i} \le 1:\)`
+
+- `\(M \left( 1 - \color{#e64173}{\epsilon_i} \right) &gt; 0\)`
+- Correct side of hyperplane
+- Wrong side of the margin &lt;br&gt;(.it[violates margin])
+- Pays cost `\(\epsilon_i\)`
+- Distance `\(&lt; M\)`
+- .ex[Examples?]
+]
+
+---
+
+$$
+`\begin{align}
+  \color{#6A5ACD}{y_i} \left( \color{#6A5ACD}{\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip}} \right) \ge M \left( 1 - \color{#e64173}{\epsilon_i} \right),
+  \quad
+  \color{#e64173}{\epsilon_i} \ge 0,
+  \quad
+  \sum_{i=1}^{n} \color{#e64173}{\epsilon_i} \le C
+\end{align}`
+$$
+
+.more-left.move-up-more[
+&lt;img src="009-slides_files/figure-html/plot-slack-2b-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.less-right.move-up[
+For `\(0 \le \color{#e64173}{\epsilon_i} \le 1:\)`
+
+- `\(M \left( 1 - \color{#e64173}{\epsilon_i} \right) &gt; 0\)`
+- Correct side of hyperplane
+- Wrong side of the margin &lt;br&gt;(.it[violates margin])
+- Pays cost `\(\epsilon_i\)`
+- Distance `\(&lt; M\)`
+- .ex[Ex:] .small[.purple[2], .orange[3]]
+]
+
+---
+
+$$
+`\begin{align}
+  \color{#FFA500}{y_i} \left( \color{#6A5ACD}{\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip}} \right) \ge M \left( 1 - \color{#e64173}{\epsilon_i} \right),
+  \quad
+  \color{#e64173}{\epsilon_i} \ge 0,
+  \quad
+  \sum_{i=1}^{n} \color{#e64173}{\epsilon_i} \le C
+\end{align}`
+$$
+
+.more-left.move-up-more[
+&lt;img src="009-slides_files/figure-html/plot-slack-3a-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.less-right.move-up[
+For `\(\color{#e64173}{\epsilon_i} \ge 1:\)`
+
+- `\(M \left( 1 - \color{#e64173}{\epsilon_i} \right) &lt; 0\)`
+- Wrong side of hyperplane
+- Pays cost `\(\epsilon_i\)`
+- Distance `\(\lesseqqgtr M\)`
+- .ex[Examples?]
+]
+
+---
+
+$$
+`\begin{align}
+  \color{#FFA500}{y_i} \left( \color{#6A5ACD}{\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip}} \right) \ge M \left( 1 - \color{#e64173}{\epsilon_i} \right),
+  \quad
+  \color{#e64173}{\epsilon_i} \ge 0,
+  \quad
+  \sum_{i=1}^{n} \color{#e64173}{\epsilon_i} \le C
+\end{align}`
+$$
+
+.more-left.move-up-more[
+&lt;img src="009-slides_files/figure-html/plot-slack-3b-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.less-right.move-up[
+For `\(\color{#e64173}{\epsilon_i} \ge 1:\)`
+
+- `\(M \left( 1 - \color{#e64173}{\epsilon_i} \right) &lt; 0\)`
+- Wrong side of hyperplane
+- Pays cost `\(\epsilon_i\)`
+- Distance `\(\lesseqqgtr M\)`
+- .ex[Ex:] .small[.purple[4], .orange[5], .orange[7], .orange[8]]
+]
+
+---
+
+$$
+`\begin{align}
+  \color{#FFA500}{y_i} \left( \color{#6A5ACD}{\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip}} \right) \ge M \left( 1 - \color{#e64173}{\epsilon_i} \right),
+  \quad
+  \color{#e64173}{\epsilon_i} \ge 0,
+  \quad
+  \sum_{i=1}^{n} \color{#e64173}{\epsilon_i} \le C
+\end{align}`
+$$
+
+.more-left.move-up-more[
+&lt;img src="009-slides_files/figure-html/plot-slack-4-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.less-right.move-up[
+.b[Support vectors]
+
+- On margin
+- Violate margin
+- Wrong side of hyperplane
+
+determine the classifier.
+]
+
+---
+layout: true
+# Support vector machines
+## Support vector classifier
+
+---
+The tuning parameter `\(C\)` determines how much *slack* we allow.
+
+`\(C\)` is our budget for violating the margin—including observations on the wrong side of the hyperplane.
+
+--
+
+.col-left[
+.note[Case 1:] `\(C=0\)`
+- We allow no violations.
+- Maximal margin hyperplane.
+- Trains on few obs.
+]
+
+--
+
+.col-right[
+.note[Case 2:] `\(C&gt;0\)`
+- `\(\le C\)` violations of hyperplane.
+- *Softens* margins
+- Larger `\(C\)` uses more obs.
+]
+
+--
+
+.clear-up[
+We tune `\(C\)` via CV to balance low bias (low `\(C\)`) and low variance (high `\(C\)`).
+]
+
+---
+layout: true
+class: clear
+
+---
+exclude: true
+
+
+
+---
+
+Starting with a low budget `\((C)\)`.
+
+&lt;img src="009-slides_files/figure-html/fig-nosep-l-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+Now for a high budget `\((C)\)`.
+
+&lt;img src="009-slides_files/figure-html/fig-nosep-h-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+class: middle
+
+The .hi[support-vector classifier] extends the .hi[maximal-margin classifier]:
+
+1. Allowing for .b[misclassification]
+  - Observations on the *wrong side of the hyperplane*.
+  - Situations where there is no separating hyperplane.
+
+1. Permitting .b[violations of the margin].
+
+1. Typically using .b[more observations] to determine decision boundary.
+
+---
+class: middle
+
+However, we still are using a (single) linear boundary between our classes.
+
+---
+exclude: true
+
+
+
+
+
+---
+
+.ex[Ex:] Some data
+
+&lt;img src="009-slides_files/figure-html/plot-nonlin-data-1.svg" style="display: block; margin: auto;" /&gt;
+---
+
+.ex[Ex:] Some data don't really work with .pink[*linear* decision boundaries].
+
+&lt;img src="009-slides_files/figure-html/plot-nonlin-lin-svm-1.svg" style="display: block; margin: auto;" /&gt;
+---
+
+.ex[Ex:] Some data may have .pink[*non-linear* decision boundaries].
+
+&lt;img src="009-slides_files/figure-html/plot-nonlin-quad-svm-1.svg" style="display: block; margin: auto;" /&gt;
+---
+
+.ex[Ex:] We could probably do even better with more flexibility.
+
+&lt;img src="009-slides_files/figure-html/plot-nonlin-quad-svm2-1.svg" style="display: block; margin: auto;" /&gt;
+---
+layout: true
+# Support vector machines
+
+---
+name: the-svm
+## Flexibility
+
+In the regression setting, we increase our model's flexiblity by adding polynomials in our predictors, _e.g._, `\(\hat{y}_i = \hat{\beta}_0  + \hat{\beta}_1 x_i + \hat{\beta}_2 x_i^2 + \hat{\beta}_3 x_i^3\)`.
+
+--
+
+We can apply a very similar idea to our support vector classifier.
+
+.note[Previously:] Train the classifier on `\(X_1, X_2, \ldots, X_p\)`.
+
+.note[Idea:] Train the classifier on `\(X_1, X_1^2, X_2, X_2^2 \ldots, X_p, X_p^2\)` (and so on).
+
+--
+
+The new classifier has a .b[linear decision boundary] in the expanded space.
+
+--
+
+The boundary is going to be .b[nonlinear] within the original space.
+
+---
+name: the-svm
+## Introducing
+
+The .attn[support vector machine] runs with this idea of expanded flexiblity.
+
+(Why stop at quadratic functions—or polynomials?)
+
+Support vector machines .b[train a support vector classifier] on .b[expanded feature].super[.pink[†]] .b[spaces] that result from applying .attn[kernels] to the original features.
+
+.footnote[
+.pink[†] feature = predictor
+]
+
+---
+name: inner
+## Dot products
+
+It turns out that solving the support vector classifier only involves the
+&lt;br&gt;.attn[dot product] of our observations.
+
+The .attn[dot product] of two vectors is defined as
+$$
+`\begin{align}
+  \langle a,b \rangle = a_1 b_1 + a_2 b_2 + \cdots + a_p b_p = \sum_{i=1}^p a_i b_i
+\end{align}`
+$$
+
+--
+
+.ex[Ex:] The dot product of `\(a\)` = (1,2) and `\(b\)` = (3,4) is `\(\langle a,b \rangle\)` = 1×3 + 2×4 = 11.
+
+--
+
+Dot products are often pitched as a measure of two vectors' similarity.
+
+
+---
+## Dot products and the SVC
+
+We can write the linear support vector classifier as
+$$
+`\begin{align}
+  f(x) = \beta_0 + \sum_{i=1}^n \alpha_i \langle x,x_i \rangle
+\end{align}`
+$$
+and we fit the `\((n)\)` `\(\alpha_i\)` and `\(\beta_0\)` with the training observations' dot products..super[.pink[†]]
+
+.footnote[
+.pink[†] The actually fitting is beyond what we're doing today.
+]
+
+--
+
+As you might guess, `\(\alpha_i\neq 0\)` only for support-vector obsevations.
+
+---
+name: svm-gen
+## Generalizing
+
+.note[Recall:] Linear support vector classifier `\(f(x) = \beta_0 + \sum_{i=1}^n \alpha_i \langle x,x_i \rangle\)`
+
+--
+
+.attn[Support vector machines] generalize this linear classifier by simply replacing `\(\langle x,x_i \rangle\)` with (non-linear) .attn[kernel functions].super[.pink[†]] `\(K(x_i,x_{i'})\)`.
+
+.footnote[
+.pink[†] Or just .it[kernels].
+]
+
+--
+
+These magical .attn[kernel functions] are various ways to measure similarity between observations.
+
+--
+
+- .note[Linear kernel:] `\(K(x_i,x_{i'}) = \sum_{i=1}^p x_{i,j} x_{i',j}\)`  .grey-light[(back to SVC)]
+
+--
+
+- .note[Polynomial kernel:] `\(K(x_i,x_{i'}) = \left( 1 + \sum_{i=1}^p x_{i,j} x_{i',j} \right)^2\)`
+
+--
+
+- .note[Radial kernel:] `\(K(x_i,x_{i'}) = \mathop{\text{exp}}\left( -\gamma \sum_{j=1}^p \left( x_{i,j} - x_{i',j} \right)^2 \right)\)`
+
+---
+layout: true
+class: clear
+
+---
+exclude: true
+
+
+
+
+
+
+
+
+
+---
+
+Our example data.
+
+&lt;img src="009-slides_files/figure-html/plot-data-nonlin-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+With a linear kernel *plus* and interaction between `\(X_1\)` and `\(X_2\)`..super[.pink[†]]
+
+.footnote[
+.pink[†] Exciting!!
+]
+
+
+&lt;img src="009-slides_files/figure-html/plot-svm-lin-kern-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+Polynomial kernel (of degree 2).
+
+&lt;img src="009-slides_files/figure-html/plot-svm-poly-kern-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+And now for the radial kernel!
+
+&lt;img src="009-slides_files/figure-html/plot-svm-radial-kern-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+Very small `\(\gamma\)` forces radial kernel to be *even more* local.
+
+&lt;img src="009-slides_files/figure-html/plot-svm-radial-kern-sigma-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+layout: true
+# Support vector machines
+
+---
+## More generalizing
+
+So why make a big deal of kernels? Anyone can transform variables.
+
+--
+
+While anyone can transform variables, you cannot transform variables to cover all spaces that our kernels cover.
+
+--
+
+For example, the feature space of the radial kernel is infinite dimensional..super[.pink[†]]
+
+.footnote[
+.pink[†] And implicit
+]
+
+--
+
+&lt;img src="images/bill.gif" style="display: block; margin: auto;" /&gt;
+
+---
+name: svm-r
+## In R
+
+As you probably guessed, `parsnip` offers several SVM options..super[†]
+
+- .b.pink[Linear].super[††] &lt;br&gt; .pink[`svm_linear(cost)`] with `"LiblineaR"` engine
+
+- .b.orange[Polynomial] &lt;br&gt; .orange[`svm_poly(cost, degree, scale_factor)`] with `"kernlab"` engine
+
+- .b.purple[Radial] &lt;br&gt; .purple[`svm_rbf(cost, rbf_sigma, scale_factor)`] with `"kernlab"` engine
+
+You can also find more kernels in the actual packages (or other packages).
+
+.footnote[
+.pink[†] `e1071` is another popular R package for SVMs, but it does not work with `tidymodels`.
+&lt;br&gt;
+.pink[††] Remember that you can still add interactions with the linear kernel.
+]
+
+---
+layout: false
+class: clear, middle
+
+.note[Note:] Costs have units. You often want to center/scale your variables.
+
+---
+# Support vector machines
+## In R
+
+For a real example let's go back to the heart disease dataset.
+- Load the data.
+- Add a recipe .b[with normalization].
+- Define the CV splits.
+
+---
+# Support vector machines
+## In R
+
+For a real example let's go back to the heart disease dataset.
+
+
+```r
+# Load the dataset
+heart_df = read_csv("Heart.csv") %&gt;%
+  dplyr::rename(id = X1, HeartDisease = AHD) %&gt;%
+  janitor::clean_names()
+# Define the recipe w/ imputation, dummies, and normalization
+heart_recipe = recipe(heart_disease ~ ., data = heart_df) %&gt;% 
+  update_role(id, new_role = "id variable") %&gt;% 
+  step_medianimpute(all_predictors() &amp; all_numeric()) %&gt;% 
+  step_modeimpute(all_predictors() &amp; all_nominal()) %&gt;% 
+  step_dummy(all_predictors() &amp; all_nominal()) %&gt;% 
+  step_normalize(all_predictors())
+# Define CV
+set.seed(12345)
+heart_splits = heart_df %&gt;% vfold_cv(v = 5)
+```
+
+---
+layout: false
+class: clear, middle
+
+.note[Note] The actual linear SVM function `linear_svm()` is under development and isn't working quite right. First-degree polynomial *is* linear.
+
+---
+layout: false
+class: clear
+
+.b.pink[SVM with linear kernel]
+
+Define the .pink[model] and workflow—tuning `\(C\)`.
+
+.col-left[
+
+```r
+# The linear-SVM model
+heart_linear = svm_poly(
+  mode = "classification",
+  cost = tune(),
+  degree = 1
+) %&gt;% set_engine("kernlab")
+# The linear-SVM workflow
+wf_linear_svm = workflow() %&gt;% 
+  add_model(heart_linear) %&gt;% 
+  add_recipe(heart_recipe)
+```
+]
+
+.col-right[
+
+```r
+# Tune the linear SVM
+tuning_linear_svm = tune_grid(
+  wf_linear_svm,
+  heart_splits,
+  grid = data.frame(
+    cost = 10^seq(-4, 2, length = 10)
+  ),
+  metrics = metric_set(
+    f_meas, accuracy
+  )
+)
+```
+]
+
+---
+class: clear
+
+.b[Performance of .pink[linear-kernel SVMs]]
+
+&lt;img src="009-slides_files/figure-html/plot-svm-linear-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+layout: false
+class: clear
+
+.b.orange[SVM with polynomial kernel]
+
+Define the .orange[model] and workflow—tuning `\(C\)` *and* `degree`.
+
+.col-left[
+
+```r
+# The linear-SVM model
+heart_poly = svm_poly(
+  mode = "classification",
+  cost = tune(),
+  degree = tune()
+) %&gt;% set_engine("kernlab")
+# The linear-SVM workflow
+wf_poly_svm = workflow() %&gt;% 
+  add_model(heart_poly) %&gt;% 
+  add_recipe(heart_recipe)
+```
+]
+
+.col-right[
+
+```r
+# Tune the linear SVM
+tuning_poly_svm = tune_grid(
+  wf_poly_svm,
+  heart_splits,
+  grid = expand_grid(
+    cost = 10^seq(-4, 2, length = 10),
+    degree = 1:3
+  ),
+  metrics = metric_set(
+    f_meas, accuracy
+  )
+)
+```
+]
+
+---
+class: clear
+
+.b[*Accuracy* of .orange[polynomial-kernel SVMs]]
+
+&lt;img src="009-slides_files/figure-html/plot-rbf-poly-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+layout: false
+class: clear
+
+.b.purple[SVM with RBF kernel]
+
+Define the .orange[model] and workflow—tuning `\(C\)` *and* `degree`.
+
+.col-left[
+
+```r
+# The linear-SVM model
+heart_rbf = svm_rbf(
+  mode = "classification",
+  cost = tune(),
+  rbf_sigma = tune()
+) %&gt;% set_engine("kernlab")
+# The linear-SVM workflow
+wf_rbf_svm = workflow() %&gt;% 
+  add_model(heart_rbf) %&gt;% 
+  add_recipe(heart_recipe)
+```
+]
+
+.col-right[
+
+```r
+# Tune the linear SVM
+tuning_rbf_svm = tune_grid(
+  wf_rbf_svm,
+  heart_splits,
+  grid = expand_grid(
+    cost = 10^seq(-4, 2, length = 10),
+    rbf_sigma = 10^c(-3:0)
+  ),
+  metrics = metric_set(
+    f_meas, accuracy
+  )
+)
+```
+]
+
+---
+class: clear
+
+.b[*Accuracy* of .purple[RBF-kernel SVMs]]
+
+&lt;img src="009-slides_files/figure-html/plot-svm-rbf-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+layout: false
+name: multiclass
+# Support vector machines
+## Multi-class classification
+
+You will commonly see SVMs applied in settings with `\(K&gt;2\)` classes.
+
+--
+
+What can we do?
+--
+ We have options!
+
+--
+
+.attn[One-versus-one classification]
+
+- Compares each *pair* of classes, one pair at a time.
+- Final prediction comes from the most-common pairwise prediction.
+
+--
+
+.attn[One-versus-all classification]
+
+- Fits `\(K\)` unique SVMs—one for each class: `\(k\)` *vs.* not `\(k\)`.
+- Predicts the class for which `\(\mathop{f}_k(x)\)` is largest.
+
+---
+name: more
+layout: false
+# SVM
+## More material
+
+Visualizing decision boundaries
+- [From `scikit-learn`](https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html)
+- [From sub-subroutine](http://www.subsubroutine.com/sub-subroutine/2016/2/15/understanding-machine-learning-techniques-by-the-decision-boundaries-they-are-capable-of)
+
+[The `kernlab` paper](https://cran.r-project.org/web/packages/kernlab/vignettes/kernlab.pdf) (describes kernel parameters)
+
+[*A Practical Guide to Support Vector Classification*](https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf)
+
+.note[Next:]
+- Prep: [A nice neural-net video](https://www.youtube.com/watch?v=aircAruvnKk)
+- Fun: [A neural-net playground](https://playground.tensorflow.org)
+
+---
+name: svr
+layout: false
+# SV Regression
+## Extending SVM regression problems
+
+You can extend this SVM idea to regression settings.
+
+.note[Recall] OLS regression chooses `\(\beta\)`s to minimize SSE-based loss.
+
+SV regression chooses `\(\beta\)`s to minimize loss based upon residuals .it[larger than some defined magnitude] (think: the margin).
+
+---
+name: sources
+layout: false
+# Sources
+
+These notes draw upon
+
+- [An Introduction to Statistical Learning](http://faculty.marshall.usc.edu/gareth-james/ISL/) (*ISL*)&lt;br&gt;James, Witten, Hastie, and Tibshirani
+---
+# Table of contents
+
+.col-left[
+.smallest[
+#### Admin
+- [Today and upcoming](#admin)
+
+#### Other
+- [More materials](#more)
+- [Sources/references](#sources)
+]
+]
+
+.col-right[
+.smallest[
+#### SVM
+1. [Intro](#intro)
+1. [Hyperplanes](#hyperplanes)
+1. [Hyperplanes and classification](#sep-class)
+1. [Which hyperplane? (The maximal margin)](#which-hyperplane)
+1. [Soft margins](#soft-margins)
+1. [The support vector classifier](#svc)
+1. [Support vector machines](#the-svm)
+  - [Intro](#the-svm)
+  - [Dot products](#inner)
+  - [Generalization](#svm-gen)
+  - [In R](#svm-r)
+1. [Multi-class classification](#multiclass)
+1. [SV Regression](#svr)
+]
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

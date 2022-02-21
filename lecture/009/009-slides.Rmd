@@ -1,0 +1,2434 @@
+---
+title: "Lecture .mono[009]"
+subtitle: "Support vector machines"
+author: "Edward Rubin"
+#date: "`r format(Sys.time(), '%d %B %Y')`"
+date: "Winter 2022"
+output:
+  xaringan::moon_reader:
+    css: ['default', 'metropolis', 'metropolis-fonts', 'my-css.css']
+    # self_contained: true
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+exclude: true
+
+```{r, setup, include = F}
+library(pacman)
+p_load(
+  tidyverse, plotly, furrr, future,
+  ggplot2, scales, extrafont, rootSolve,
+  kableExtra, DT, huxtable,
+  data.table, dplyr, janitor,
+  lubridate, knitr,
+  e1071, kernlab, caret, tidymodels,
+  here, magrittr, parallel
+)
+# Define colors
+red_pink   = "#e64173"
+turquoise  = "#20B2AA"
+orange     = "#FFA500"
+red        = "#fb6107"
+blue       = "#3b3b9a"
+green      = "#8bb174"
+grey_light = "grey70"
+grey_mid   = "grey50"
+grey_dark  = "grey20"
+purple     = "#6A5ACD"
+slate      = "#23373b"
+# Knitr options
+opts_chunk$set(
+  comment = "#>",
+  fig.align = "center",
+  fig.height = 7,
+  fig.width = 10.5,
+  warning = F,
+  message = F
+)
+opts_chunk$set(dev = "svg")
+options(device = function(file, width, height) {
+  svg(tempfile(), width = width, height = height)
+})
+options(knitr.table.format = "html")
+# A few extras
+xaringanExtra::use_xaringan_extra(c("tile_view", "fit_screen"))
+```
+
+---
+name: admin
+# Admin
+## Today
+
+.b[Topic] Support vector machines
+
+## Upcoming
+
+.b[Readings]
+- .note[Today] .it[ISL] Ch. 9
+- .note[Next] .it[100ML] Ch. [6](https://www.dropbox.com/s/uh48e6wjs4w13t5/Chapter6.pdf?dl=0)
+
+.b[Project] Project updates/questions?
+
+---
+layout: true
+# Support vector machines
+
+---
+class: inverse, middle
+
+---
+name: intro
+## Intro
+
+.attn[Support vector machines] (SVMs) are a .it[general class] of classifiers that essentially attempt to separate two classes of observations.
+
+--
+
+> SVMs have been shown to perform well in a variety of settings, and are often considered one of the best "out of the box" classifiers.
+.grey-light.it[ISL, p. 337]
+
+--
+
+The .attn[support vector machine] generalizes a much simpler classifier—the .attn[maximal margin classifier].
+
+The .attn[maximal margin classifier] attempts to separate the .b[two classes] in our prediction space using .b[a single hyperplane].
+
+---
+name: hyperplanes
+## What's a hyperplane?
+
+Consider a space with $p$ dimensions.
+
+A .attn[hyperplane] is a $p-1$ dimensional .b[subspace] that is
+
+1. .b[flat] (no curvature)
+1. .b[affine] (may or may not pass through the origin)
+
+--
+
+.ex[Example] In $p=1$ dimension, a .it.pink[hyperplane] is a
+
+```{r, hp-1a, echo = F, fig.height = 2.5}
+ggplot(
+  data = tibble(x = 1:10, y = 1),
+  aes(x, y)
+) +
+annotate(
+  geom = "segment",
+  x = 0, xend = 10,
+  y = 1, yend = 1,
+  size = 2.5,
+  color = slate,
+  alpha = 0.3
+) +
+theme_void()
+```
+
+---
+
+## What's a hyperplane?
+
+Consider a space with $p$ dimensions.
+
+A .attn[hyperplane] is a $p-1$ dimensional .b[subspace] that is
+
+1. .b[flat] (no curvature)
+1. .b[affine] (may or may not pass through the origin)
+
+.ex[Example] In $p=1$ dimension, a .it.pink[hyperplane] is a point.
+
+```{r, hp-1b, echo = F, fig.height = 2.5}
+ggplot(
+  data = tibble(x = 1:10, y = 1),
+  aes(x, y, color = x > 5)
+) +
+annotate(
+  geom = "segment",
+  x = 0, xend = 5,
+  y = 1, yend = 1,
+  size = 2.5,
+  color = orange
+) +
+annotate(
+  geom = "segment",
+  x = 5, xend = 10,
+  y = 1, yend = 1,
+  size = 2.5,
+  color = slate
+) +
+annotate(
+  geom = "point",
+  x = 5,
+  y = 1,
+  size = 6.5,
+  color = red_pink
+) +
+theme_void()
+```
+
+---
+
+
+## What's a hyperplane?
+
+Consider a space with $p$ dimensions.
+
+A .attn[hyperplane] is a $p-1$ dimensional .b[subspace] that is
+
+1. .b[flat] (no curvature)
+1. .b[affine] (may or may not pass through the origin)
+
+.ex[Example] In $p=2$ dimensions, a .it.pink[hyperplane] is a
+
+```{r, hp-2a, echo = F, fig.height = 2.5}
+ggplot(
+  data = tibble(
+    x = c(-2,-2, 6, 6,-2),
+    y = c( 2, 0, 0, 2, 2),
+    id = rep(as.character(1), each = 5),
+  ),
+  aes(x, y, fill = id)
+) +
+geom_polygon(
+  aes(group = id),
+  color = NA,
+  fill = slate,
+  alpha = 0.3
+) +
+theme_void() +
+theme(legend.position = "none")
+```
+
+---
+
+## What's a hyperplane?
+
+Consider a space with $p$ dimensions.
+
+A .attn[hyperplane] is a $p-1$ dimensional .b[subspace] that is
+
+1. .b[flat] (no curvature)
+1. .b[affine] (may or may not pass through the origin)
+
+.ex[Example] In $p=2$ dimensions, a .it.pink[hyperplane] is a line.
+
+```{r, hp-2b, echo = F, fig.height = 2.5}
+ggplot(
+  data = tibble(
+    x = c(0, 4,-2,-2, 0,  0, 4, 6, 6, 0),
+    y = c(0, 2, 2, 0, 0,  0, 2, 2, 0, 0),
+    id = rep(as.character(1:2), each = 5),
+  ),
+  aes(x, y, fill = id, alpha = id)
+) +
+geom_polygon(
+  aes(group = id),
+  color = NA
+) +
+geom_abline(
+  intercept = 0, slope = 0.5,
+  color = red_pink,
+  size = 2.5
+) +
+scale_fill_manual(values = c(orange, slate)) +
+scale_alpha_manual(values = c(1, 0.85)) +
+theme_void() +
+theme(legend.position = "none")
+```
+
+---
+
+## What's a hyperplane?
+
+Consider a space with $p$ dimensions.
+
+A .attn[hyperplane] is a $p-1$ dimensional .b[subspace] that is
+
+1. .b[flat] (no curvature)
+1. .b[affine] (may or may not pass through the origin)
+
+.ex[Example] In $p=3$ dimensions, a .it.pink[hyperplane] is a
+--
+ (2D) plane.
+
+---
+## Hyperplanes
+
+We can define a .attn[hyperplane] in $p$ dimensions by constraining the linear combination of the $p$ dimensions..super[.pink[†]]
+
+.footnote[
+.pink[†] Plus some offset ("intercept")
+<br>.tran[.pink[††] Alternatively: The hyperplane is composed of such points.]
+]
+
+--
+
+For example, in two dimensions a hyperplane is defined by
+$$
+\begin{align}
+  \beta_0 + \beta_1 X_{1} + \beta_2 X_{2} = 0
+\end{align}
+$$
+
+which is just the equation for a line.
+
+--
+
+Points $X=\left( X_1,\,X_2 \right)$ that satisfy the equality .it[live] on the hyperplane..super[.pink[††]]
+
+.footnote[
+.tran[.pink[†] Plus some offset ("intercept")]
+<br>.pink[††] Alternatively: The hyperplane is composed of such points.
+]
+
+
+---
+## Separating hyperplanes
+
+More generally, in $p$ dimensions, we defined a hyperplane by
+$$
+\begin{align}
+  \beta_0 + \beta_1 X_{1} + \beta_2 X_{2} + \cdots + \beta_p X_{p} = 0
+  \tag{A}
+\end{align}
+$$
+
+If $X=\left( X_1,\,X_2,\, \ldots,\, X_p \right)$ satisfies the equality, it is on the hyperplane.
+
+--
+
+Of course, not every point in the $p$ dimensions will satisfy $\text{A}$.
+
+- If $\beta_0 + \beta_1 X_{1} + \cdots + \beta_p X_{p} > 0$, then $X$ is .hi-purple.it[above] the hyperplane.
+
+- If $\beta_0 + \beta_1 X_{1} + \cdots + \beta_p X_{p} < 0$, then $X$ sits .hi-orange.it[below] the hyperplane.
+
+--
+
+The hyperplane .it[separates] the $p$-dimensional space into two "halves".
+
+---
+layout: true
+class: clear
+
+---
+exclude: true
+
+```{r, data-sep, include = F, cache = T}
+# Create dataset
+n_sep = 100
+sep_dt = expand_grid(
+  x1 = seq(-n_sep, n_sep, by = 2.5),
+  x2 = seq(-n_sep, n_sep, by = 2.5)
+) %T>% setDT()
+# Define the planes
+sep_dt[, `:=`(
+  above = 3 + 2 * x1 - 4 * x2 > 0
+)]
+```
+
+---
+
+.ex[Ex:] A .hi-pink[separating hyperplane] in two dimensions: $\color{#e64173}{3 + 2 X_1 - 4 X_2 = 0}$
+
+
+```{r, fig-sep-2d, echo = F, cache = T, dependson = "data-sep"}
+ggplot(
+  data = sep_dt,
+  aes(x1, x2, color = above)
+) +
+geom_point(size = 0.8) +
+geom_abline(
+  intercept = 3/4, slope = 1/2,
+  color = red_pink,
+  size = 2
+) +
+xlab(expression(X[1])) +
+ylab(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+
+---
+exclude: true
+
+```{r, data-sep-3d, include = F, cache = T}
+# Create dataset
+sep3_dt = expand_grid(
+  x1 = seq(-300, 300, length = 8),
+  x2 = seq(-100, 100, length = 8),
+  x3 = seq(-450, 450, length = 8)
+) %T>% setDT()
+# Define the planes
+sep3_dt[, `:=`(
+  above = 3 + 2 * x1 - 4 * x2 + 2 * x3 > 0
+)]
+# Points from the plane
+points3 = sep3_dt[, .(x1, x2)] %>% unique()
+points3[, x3 := (3 + 2 * x1 - 4 * x2) / (-2)]
+```
+
+---
+
+.ex[Ex:] A .hi-pink[separating hyperplane] in 3 dimensions: $\color{#e64173}{3 + 2 X_1 - 4 X_2 + 2 X_3 = 0}$
+
+```{r, fig-sep-3d, echo = F, cache = T}
+# Create figure
+p = plot_ly(
+  sep3_dt,
+  x = ~x1,
+  y = ~x2,
+  z = ~x3,
+  type = "scatter3d",
+  mode = "markers",
+  marker = list(color = c(purple, orange)[(-1) * sep3_dt$above + 2]),
+  showscale = F
+)
+p = add_surface(
+  p = p,
+  x = points3$x1 %>% unique(),
+  y = points3$x2 %>% unique(),
+  z = points3 %>% reshape2::acast(x2~x1),
+  surfacecolor = rep(1, uniqueN(points3[,1:2])),
+  colorscale = list(c(0, 1), c(red_pink, red_pink)),
+  showscale = F,
+  showlegend = F
+) %>% hide_colorbar()
+# Save
+htmlwidgets::saveWidget(p, "fig-sep-3d.html")
+```
+
+<iframe src="fig-sep-3d.html" width="100%" height="600" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"> </iframe>
+
+---
+layout: true
+# Support vector machines
+
+---
+name: sep-class
+## Separating hyperplanes and classification
+
+.note[Idea:] .it[Separate] two classes of outcomes in the $p$ dimensions of our predictor space using a separating hyperplane.
+
+--
+
+To make a prediction for observation $(x^o,\,y^o)=(x_1^o,\,x_2^o,\,\ldots,\,x_p^o,\,y^o):$
+
+We classify points that live .purple["above" of the plane] as one class, *i.e.*,
+.center[
+If $\beta_0 + \beta_1 x^o_{1} + \cdots + \beta_p x^o_{p} \color{#6A5ACD}{> 0}$, then $\color{#6A5ACD}{\hat{y}^o =}$ .purple[Class 1]
+]
+
+We classify points .orange["below" the plane] as the other class, *i.e.*,
+.center[
+If $\beta_0 + \beta_1 x^o_{1} + \cdots + \beta_p x^o_{p} \color{#FFA500}{< 0}$, then $\color{#FFA500}{\hat{y}^o =}$ .orange[Class 2]
+]
+
+--
+
+.note[Note] This strategy assumes a separating hyperplane exists.
+
+---
+exclude: true
+
+```{r, sample-2d, include = F}
+# Sample from 2D points
+set.seed(12345)
+sep_sub = sep_dt %>% sample_n(20) %>% mutate(y = if_else(above == T, 1, -1))
+```
+
+---
+
+.it[If] .hi-pink[a separating hyperplane] exists,
+
+```{r, fig-plane-class-1, echo = F, fig.height = 6.5}
+# Plot
+ggplot(
+  data = sep_sub, aes(x1, x2, color = above)
+) +
+# geom_point(data = sep_dt, size = 0.8) +
+geom_abline(intercept = 3/4, slope = 1/2, color = red_pink, size = 1) +
+geom_point(size = 3.5, alpha = 0.8) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+---
+count: false
+
+.it[If] .hi-pink[a separating hyperplane] exists, then it defines a binary classifier.
+
+```{r, fig-plane-class-2, echo = F, fig.height = 6.5}
+# Plot
+ggplot(
+  data = sep_sub, aes(x1, x2, color = above)
+) +
+geom_abline(intercept = 3/4, slope = 1/2, color = red_pink, size = 1) +
+geom_point(data = sep_dt, size = 0.8) +
+geom_point(size = 3.5, alpha = 1) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+
+
+---
+
+.it[If] .hi-pink[a separating hyperplane] exists,
+
+```{r, fig-many-planes-1, echo = F, fig.height = 6.5}
+# Plot
+ggplot(
+  data = sep_sub,
+  aes(x1, x2, color = above)
+) +
+geom_abline(intercept = -10, slope = 0.7, color = NA, size = 0.6) +
+geom_abline(intercept = -5, slope = 1/3, color = NA, size = 0.6) +
+geom_abline(intercept = -10, slope = 0.4, color = NA, size = 0.6) +
+geom_abline(intercept = 3/4, slope = 1/2, color = red_pink, size = 1) +
+geom_point(size = 3.5, alpha = 0.8) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+
+---
+count: false
+
+.it[If] .hi-pink[a separating hyperplane] exists, then .hi-slate[many separating hyperplanes] exist.
+
+```{r, fig-many-planes-2, echo = F, fig.height = 6.5}
+# Plot
+ggplot(
+  data = sep_sub,
+  aes(x1, x2, color = above)
+) +
+geom_abline(intercept = -10, slope = 0.7, color = slate, size = 0.6) +
+geom_abline(intercept = -5, slope = 1/3, color = slate, size = 0.6) +
+geom_abline(intercept = -10, slope = 0.4, color = slate, size = 0.6) +
+geom_abline(intercept = 3/4, slope = 1/2, color = red_pink, size = 1) +
+geom_point(size = 3.5, alpha = 0.8) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+---
+
+A .b[a separating hyperplane] may not exist.
+
+```{r, fig-non-existant, echo = F, fig.height = 6.5}
+# Plot
+ggplot(
+  data = sep_sub %>% bind_rows(tibble(x1 = -42, x2 = 65, above = T)),
+  aes(x1, x2, color = above)
+) +
+geom_point(size = 3.5, alpha = 0.8) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+
+---
+## Decisions
+
+.note[Summary] A given hyperplane
+$$
+\begin{align}
+  \color{#e64173}{\beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_p x_p} = 0
+\end{align}
+$$
+produces a decision boundary.
+
+
+--
+
+We can determine any point's $\left( x^o \right)$ .it[side] of the boundary.
+$$
+\begin{align}
+  \mathop{f}\left( x^o \right) =  \color{#e64173}{\beta_0 + \beta_1 x^o_1 + \beta_2 x^o_2 + \cdots + \beta_p x^o_p}
+\end{align}
+$$
+
+We classify observationg $x^o$ based upon whether $\mathop{f}\left( x^o \right)$ is .purple[positive]/.orange[negative].
+
+The magnitude of $\mathop{f}\left( x^o \right)$ tells us about our .it[confidence] in the classification..super[.pink[†]]
+
+.footnote[
+.pink[†] Larger magnitudes are farther from the boundary.
+]
+
+---
+name: which-hyperplane
+## Which separating hyperplane?
+
+.qa[Q] How do we choose between the possible hyperplanes?
+
+--
+
+.qa[A] .it[One solution:] Choose the separating hyperplane that is "farthest" from the training data points—maximizing "separation."
+
+--
+
+The .attn[maximal margin hyperplane].super[.pink[†]] is the hyperplane that
+
+.footnote[
+.pink[†] AKA the .it[optimal separating hyperplane]
+<br>.tran[.pink[††] The distance to the nearest observation.]
+]
+
+1. .hi[separates] the two classes of obsevations
+1. .hi[maximizes] the .attn[margin]—the distance to the nearest observation.super[.pink[††]]
+
+.footnote[
+.tran[.pink[†] AKA the .it[optimal separating hyperplane]]
+<br>.pink[††] Put differently: The smallest distance to a training observation.
+]
+
+where .it[distance] is a point's perpendicular distance to the hyperplane.
+
+---
+exclude: true
+
+```{r, find-mmh, include = F, cache = T}
+# Calculating the MMH for our data
+# Distance
+dist_fun = function(b0, b1, b2) abs(b0 + b1 * sep_sub$x1  + b2 * sep_sub$x2) / sqrt(b1^2 + b2^2)
+# Maximal margin function
+mmh = function(b0, b1, b2) {
+  all_m = abs(b0 + b1 * sep_sub$x1  + b2 * sep_sub$x2) / sqrt(b1^2 + b2^2)
+  tibble(
+    b0, b1, b2,
+    m = min(all_m),
+    # c1 = (b1^2 + b2^2) == 1,
+    c2 = all(sep_sub$y * (b0 + b1 * sep_sub$x1 + b2 * sep_sub$x2) > min(all_m))
+  )
+}
+# Grid to search
+mmh_grid = expand_grid(
+  b0 = seq(-67, -66, 0.01),
+  b1 = seq(2.8, 3.1, 0.01),
+  b2 = seq(-5.6, -5.4, 0.01)
+)
+# Results of grid search
+plan(multisession, workers = 10)
+mmh_df = future_pmap_dfr(mmh_grid, mmh)
+# Optimal set
+mmh_optim = mmh_df %>% filter(c2 == T) %>% arrange(-m) %>% head(1)
+# Remove other items
+rm(mmh_grid, mmh_df)
+```
+
+---
+layout: true
+class: clear
+
+---
+
+The .hi-pink[maximal margin hyperplane]...
+
+```{r, fig-mmh-1, echo = F}
+b0 = mmh_optim$b0
+b1 = mmh_optim$b1
+b2 = mmh_optim$b2
+m = mmh_optim$m
+# Distance to line
+dist_fun = function(b0, b1, b2) abs(b0 + b1 * sep_sub$x1  + b2 * sep_sub$x2) / sqrt(b1^2 + b2^2)
+sep_sub %<>% mutate(dist = dist_fun(b0, b1, b2))
+# Plot (values from previous chunk)
+ggplot(data = sep_sub) +
+geom_abline(intercept = b0/(-b2), slope = b1/(-b2), color = red_pink, size = 1) +
+geom_point(aes(x = x1, y = x2, color = above), size = 3.5, alpha = 0.8) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+---
+
+...maximizes the .b.grey[margin] between the hyperplane and training data...
+
+```{r, fig-mmh-2, echo = F}
+# Nearest point on the line
+sep_sub %<>% mutate(
+  x1_near = (b2 * (b2 * x1 - b1 * x2) - b1 * b0) / (b1^2 + b2^2),
+  x2_near = (b1 * (-b2 * x1 + b1 * x2) - b2 * b0) / (b1^2 + b2^2)
+)
+# Plot (values from previous chunk)
+ggplot(data = sep_sub) +
+geom_ribbon(
+  data = tibble(
+    x = c(-100, 100),
+    ymin = b0/(-b2) + b1/(-b2) * x - m,
+    ymax = b0/(-b2) + b1/(-b2) * x + m
+  ),
+  aes(x = x, ymin = ymin, ymax = ymax),
+  fill = "black",
+  alpha = 0.15
+) +
+geom_abline(intercept = b0/(-b2), slope = b1/(-b2), color = red_pink, size = 1) +
+geom_point(aes(x = x1, y = x2, color = above), size = 3.5, alpha = 0.8) +
+geom_segment(
+  data = sep_sub %>% arrange(dist) %>% head(3),
+  aes(x = x1, xend = x1_near, y = x2, yend = x2_near),
+  color = slate
+) +
+geom_point(
+  data = sep_sub %>% arrange(dist) %>% head(3),
+  aes(x = x1, y = x2),
+  size = 0.7, color = slate
+) +
+geom_point(
+  data = sep_sub %>% arrange(dist) %>% head(3),
+  aes(x = x1_near, y = x2_near),
+  size = 0.7, color = slate
+) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+---
+
+...and is supported by three equidistant observations—the .b[support vectors].
+
+```{r, fig-mmh-3, echo = F}
+# Plot (values from previous chunk)
+ggplot(data = sep_sub) +
+geom_ribbon(
+  data = tibble(
+    x = c(-100, 100),
+    ymin = b0/(-b2) + b1/(-b2) * x - m,
+    ymax = b0/(-b2) + b1/(-b2) * x + m
+  ),
+  aes(x = x, ymin = ymin, ymax = ymax),
+  fill = "black",
+  alpha = 0.15
+) +
+geom_abline(intercept = b0/(-b2), slope = b1/(-b2), color = red_pink, size = 1) +
+geom_point(aes(x = x1, y = x2, color = above), size = 3.5, alpha = 0.8) +
+geom_point(
+  data = sep_sub %>% arrange(dist) %>% head(3),
+  aes(x = x1, y = x2),
+  size = 4, color = "black", shape = 1, stroke = 1
+) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+
+---
+layout: true
+# Support vector machines
+
+
+---
+## The maximal margin hyperplane
+
+Formally, the .attn[maximal margin hyperplane] solves the problem:
+
+Maximize the margin $M$ over the set of $\left\{ \beta_0,\, \beta_1,\, \ldots,\, \beta_p,\, M \right\}$ such that
+
+--
+
+$$
+\begin{align}
+   \sum_{j=1}^{p} \beta_j^2 = 1
+   \tag{1}
+\end{align}
+$$
+
+$$
+\begin{align}
+  y_i \left( \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip} \right) \ge M
+  \tag{2}
+\end{align}
+$$
+
+for all observations $i$.
+
+--
+
+$(2)$ Ensures we separate (classify) observations correctly.
+
+--
+
+$(1)$ allows us to interpret $(2)$ as "distance from the hyperplane".
+
+---
+## Fake constraints
+
+Note that our first "constraint"
+$$
+\begin{align}
+   \sum_{j=1}^{p} \beta_j^2 = 1
+   \tag{1}
+\end{align}
+$$
+does not actually constrain $-1 \le \beta_j \le 1$ (or the hyperplane).
+
+--
+
+If we can define a hyperplane by
+$$
+\begin{align}
+  \beta_0 + \beta_1 x_{i,1} + \beta_2 x_{i,2} + \cdots + \beta_p x_{i,p} = 0
+\end{align}
+$$
+then we can also rescale the same hyperplane with some constant $k$
+$$
+\begin{align}
+  k \left( \beta_0 + \beta_1 x_{i,1} + \beta_2 x_{i,2} + \cdots + \beta_p x_{i,p} \right) = 0
+\end{align}
+$$
+
+
+---
+## The maximal margin classifier
+
+The maximal margin hyperplane produces the .attn[maximal margin classifier].
+
+--
+
+.note[Notes]
+
+1. We are doing .b[binary classification].
+
+1. The decision boundary only uses the .b[support vectors]—very sensitive.
+
+1. This classifier can struggle in .b[large dimensions] (big $p$).
+
+1. A separating hyperplane does not always exist (.b[non-separable]).
+
+1. Decision boundaries can be .b[nonlinear].
+
+---
+layout: false
+class: clear, middle
+
+Let's start by addressing non-separability...
+
+---
+class: clear, middle
+
+Surely there's still a decent hyperplane-based classifier here, right?
+
+```{r, fig-non-existant-2, echo = F}
+# Plot
+ggplot(
+  data = sep_sub %>% bind_rows(tibble(x1 = -42, x2 = 65, above = T)),
+  aes(x1, x2, color = above)
+) +
+geom_point(size = 3.5, alpha = 0.8) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+
+
+---
+layout: true
+# Support vector machines
+
+---
+name: soft-margins
+## Soft margins
+
+When we cannot .it[perfectly] separate our classes, we can use .attn[soft margins], which are margins that "accept" some number of observations.
+
+--
+
+.note[The idea:] We will allow observations to be
+1. in the margin
+2. on the wrong side of the hyperplane
+
+but each will come with a price.
+
+--
+
+Using these .it[soft margins], we create a hyperplane-based classifier called the .attn[support vector classifier]..super[.pink[†]]
+
+.footnote[
+.pink[†] Also called the .it[soft margin classifier].
+]
+
+---
+exclude: true
+
+```{r, data-nosep, include = F, cache = T}
+# Create dataset
+n_sep = 100
+nosep_dt = expand_grid(
+  x1 = seq(-n_sep, n_sep, by = 2.5),
+  x2 = seq(-n_sep, n_sep, by = 2.5)
+) %T>% setDT()
+# Define the planes
+set.seed(1)
+nosep_dt[, f := 3 + 2 * x1 - 4 * x2]
+nosep_dt[, e := 5e4 * runif(.N, min = -1, max = 1) / abs(f)]
+nosep_dt[, above := f + e > 0]
+```
+
+```{r, data-nosep-sub, include = F}
+# Take subset
+set.seed(777)
+nosep_sub = nosep_dt %>%
+  sample_n(20) %>%
+  mutate(
+    y = if_else(above == T, 1, -1),
+    above_fac = factor(above)
+  )
+```
+
+```{r, est-svm, include = F}
+# Tune the cost
+nosep_cv = tune.svm(
+  above_fac ~ x1 + x2,
+  data = nosep_sub,
+  kernel = "linear",
+  degree = 1,
+  cost = c(0.1, 1:3, 10, 100),
+  tunecontrol = tune.control(cross = 5)
+)
+# Fit the model
+nosep_svm = svm(
+  above_fac ~ x1 + x2,
+  data = nosep_sub,
+  kernel = "linear",
+  degree = 1,
+  cost = nosep_cv$best.parameters$cost,
+  scale = F
+)
+bn0 = coef(nosep_svm)[1]
+bn1 = coef(nosep_svm)[2]
+bn2 = coef(nosep_svm)[3]
+```
+
+---
+layout: false
+class: clear
+
+Our underlying population clearly does not have a separating hyperplane.
+
+```{r, fig-nosep-1, echo = F}
+# Plot
+ggplot(
+  data = nosep_dt,
+  aes(x1, x2, color = above)
+) +
+geom_point(size = 0.5, alpha = 0.8) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+
+---
+class: clear
+
+Our sample population also does not have a separating hyperplane.
+
+```{r, fig-nosep-2, echo = F}
+# Plot
+ggplot(
+  data = nosep_sub,
+  aes(x1, x2, color = above)
+) +
+geom_point(size = 3.5, alpha = 0.8) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+
+---
+class: clear
+
+Our .hi[hyperplane]
+
+```{r, fig-nosep-3a, echo = F}
+# Plot
+ggplot(
+  data = nosep_sub,
+  aes(x1, x2, color = above)
+) +
+geom_point(size = 3.5, alpha = 0.8) +
+geom_abline(intercept = -bn0/bn2, slope = -bn1/bn2, color = red_pink, size = 1) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+
+---
+class: clear
+
+Our .hi[hyperplane] with .hi-grey[soft margins]...
+
+```{r, fig-nosep-3b, echo = F}
+# Plot
+ggplot(
+  data = nosep_sub,
+  aes(x1, x2, color = above)
+) +
+geom_point(size = 3.5, alpha = 0.8) +
+geom_ribbon(
+  data = tibble(
+    x = c(-100, 100),
+    ymin = (bn0 - 1)/(-bn2) + bn1/(-bn2) * x,
+    ymax = (bn0 + 1)/(-bn2) + bn1/(-bn2) * x
+  ),
+  aes(x = x, y = x, ymin = ymin, ymax = ymax, color = NA),
+  fill = "black", alpha = 0.1
+) +
+geom_abline(intercept = -bn0/bn2, slope = -bn1/bn2, color = red_pink, size = 1) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+---
+class: clear
+
+Our .hi[hyperplane] with .hi-grey[soft margins] and .b[support vectors].
+
+```{r, fig-nosep-3c, echo = F}
+# Plot
+ggplot(
+  data = nosep_sub,
+  aes(x1, x2, color = above)
+) +
+geom_point(size = 3.5, alpha = 0.8) +
+geom_ribbon(
+  data = tibble(
+    x = c(-100, 100),
+    ymin = -(bn0 - 1)/bn2 -bn1/bn2 * x,
+    ymax = -(bn0 + 1)/bn2 -bn1/bn2 * x
+  ),
+  aes(x = x, y = x, ymin = ymin, ymax = ymax, color = NA),
+  fill = "black", alpha = 0.1
+) +
+geom_point(
+  data = nosep_sub[nosep_svm$index,],
+  color = "black",
+  shape = 1,
+  size = 4,
+  stroke = 1
+) +
+geom_abline(intercept = -bn0/bn2, slope = -bn1/bn2, color = red_pink, size = 1) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+---
+class: clear
+
+.b[Support vectors:] on (i) the margin or (ii) on the wrong side of the margin.
+
+```{r, fig-nosep-3d, echo = F}
+# Plot
+gg_nosep = ggplot(
+  data = nosep_sub,
+  aes(x1, x2, color = above)
+) +
+geom_point(size = 3.5, alpha = 0.8) +
+geom_ribbon(
+  data = tibble(
+    x = c(-100, 100),
+    ymin = -(bn0 - 1)/bn2 -bn1/bn2 * x,
+    ymax = -(bn0 + 1)/bn2 -bn1/bn2 * x
+  ),
+  aes(x = x, y = x, ymin = ymin, ymax = ymax, color = NA),
+  fill = "black", alpha = 0.1
+) +
+geom_point(
+  data = nosep_sub[nosep_svm$index,],
+  color = "black",
+  shape = 1,
+  size = 4,
+  stroke = 1
+) +
+geom_abline(intercept = -bn0/bn2, slope = -bn1/bn2, color = red_pink, size = 1) +
+geom_text(
+  data = nosep_sub[nosep_svm$index,] %>% mutate(n = seq_along(nosep_svm$index)),
+  aes(y = x2 + 7, label = n),
+  size = 5,
+  family = "Fira Sans Book"
+) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+# Print the plot
+gg_nosep
+```
+---
+layout: true
+# Support vector machines
+## Support vector classifier
+
+---
+name: svc
+
+The .attn[support vector classifier] selects a hyperplane by solving the problem
+
+Maximize the margin $M$ over the set $\left\{ \beta_0, \beta_1, \ldots,\beta_p, \epsilon_1, \ldots, \epsilon_n, M  \right\}$ s.t.
+
+--
+
+$$
+\begin{align}
+  \sum_{j=1}^{p} \beta_j^2 = 1
+  \tag{3}
+\end{align}
+$$
+
+--
+
+$$
+\begin{align}
+  y_i \left( \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip} \right) \ge M \left( 1 - \epsilon_i \right)
+  \tag{4}
+\end{align}
+$$
+
+--
+
+$$
+\begin{align}
+  \epsilon_i \ge 0, \quad \sum_{i=1}^{n} \epsilon_i \le C
+  \tag{5}
+\end{align}
+$$
+
+The $\epsilon_i$ are .attn[slack variables] that allow $i$ to .it[violate] the margin or hyperplane.
+--
+<br>
+$C$ gives is our budget for these violations.
+
+---
+layout: true
+class: clear
+
+---
+class: middle
+
+Let's consider constraints $(4)$ and $(5)$ work together...
+
+$$
+\begin{align}
+  y_i \left( \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip} \right) \ge M \left( 1 - \epsilon_i \right)
+  \tag{4}
+\end{align}
+$$
+
+$$
+\begin{align}
+  \epsilon_i \ge 0, \quad \sum_{i=1}^{n} \epsilon_i \le C
+  \tag{5}
+\end{align}
+$$
+
+---
+
+$$
+\begin{align}
+  \color{#6A5ACD}{y_i} \left( \color{#6A5ACD}{\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip}} \right) \ge M \left( 1 - \color{#e64173}{\epsilon_i} \right),
+  \quad
+  \color{#e64173}{\epsilon_i} \ge 0,
+  \quad
+  \sum_{i=1}^{n} \color{#e64173}{\epsilon_i} \le C
+\end{align}
+$$
+
+.more-left.move-up-more[
+```{r, plot-slack-1a, echo = F, fig.dim=c(7, 7), out.width="100%"}
+gg_nosep
+```
+]
+
+.less-right.move-up[
+For $\color{#e64173}{\epsilon_i} = 0:$
+
+- $M \left( 1 - \color{#e64173}{\epsilon_i} \right) > 0$
+- Correct side of hyperplane
+- Correct side of margin <br>(or on margin)
+- No cost $(C)$
+- Distance $\ge M$
+- .ex[Examples?] $\color{#ffffff}{\left( \times \right)}$
+]
+---
+
+$$
+\begin{align}
+  \color{#6A5ACD}{y_i} \left( \color{#6A5ACD}{\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip}} \right) \ge M \left( 1 - \color{#e64173}{\epsilon_i} \right),
+  \quad
+  \color{#e64173}{\epsilon_i} \ge 0,
+  \quad
+  \sum_{i=1}^{n} \color{#e64173}{\epsilon_i} \le C
+\end{align}
+$$
+
+.more-left.move-up-more[
+```{r, plot-slack-1b, echo = F, fig.dim=c(7, 7), out.width="100%"}
+gg_nosep +
+geom_point(
+  data = nosep_sub[setdiff(1:nrow(nosep_sub), nosep_svm$index),],
+  color = slate,
+  shape = 4,
+  size = 4,
+  stroke = 0.75
+)
+```
+]
+
+.less-right.move-up[
+For $\color{#e64173}{\epsilon_i} = 0:$
+
+- $M \left( 1 - \color{#e64173}{\epsilon_i} \right) > 0$
+- Correct side of hyperplane
+- Correct side of margin <br>(or on margin)
+- No cost $(C)$
+- Distance $\ge M$
+- Correct side of margin: $\left( \color{#314f4f}{\times} \right)$
+- .it[On margin:] .small[.purple[1], .orange[6], .orange[9]]
+]
+
+---
+
+$$
+\begin{align}
+  \color{#6A5ACD}{y_i} \left( \color{#6A5ACD}{\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip}} \right) \ge M \left( 1 - \color{#e64173}{\epsilon_i} \right),
+  \quad
+  \color{#e64173}{\epsilon_i} \ge 0,
+  \quad
+  \sum_{i=1}^{n} \color{#e64173}{\epsilon_i} \le C
+\end{align}
+$$
+
+.more-left.move-up-more[
+```{r, plot-slack-2a, echo = F, fig.dim=c(7, 7), out.width="100%"}
+gg_nosep
+```
+]
+
+.less-right.move-up[
+For $0 \le \color{#e64173}{\epsilon_i} \le 1:$
+
+- $M \left( 1 - \color{#e64173}{\epsilon_i} \right) > 0$
+- Correct side of hyperplane
+- Wrong side of the margin <br>(.it[violates margin])
+- Pays cost $\epsilon_i$
+- Distance $< M$
+- .ex[Examples?]
+]
+
+---
+
+$$
+\begin{align}
+  \color{#6A5ACD}{y_i} \left( \color{#6A5ACD}{\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip}} \right) \ge M \left( 1 - \color{#e64173}{\epsilon_i} \right),
+  \quad
+  \color{#e64173}{\epsilon_i} \ge 0,
+  \quad
+  \sum_{i=1}^{n} \color{#e64173}{\epsilon_i} \le C
+\end{align}
+$$
+
+.more-left.move-up-more[
+```{r, plot-slack-2b, echo = F, fig.dim=c(7, 7), out.width="100%"}
+gg_nosep
+```
+]
+
+.less-right.move-up[
+For $0 \le \color{#e64173}{\epsilon_i} \le 1:$
+
+- $M \left( 1 - \color{#e64173}{\epsilon_i} \right) > 0$
+- Correct side of hyperplane
+- Wrong side of the margin <br>(.it[violates margin])
+- Pays cost $\epsilon_i$
+- Distance $< M$
+- .ex[Ex:] .small[.purple[2], .orange[3]]
+]
+
+---
+
+$$
+\begin{align}
+  \color{#FFA500}{y_i} \left( \color{#6A5ACD}{\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip}} \right) \ge M \left( 1 - \color{#e64173}{\epsilon_i} \right),
+  \quad
+  \color{#e64173}{\epsilon_i} \ge 0,
+  \quad
+  \sum_{i=1}^{n} \color{#e64173}{\epsilon_i} \le C
+\end{align}
+$$
+
+.more-left.move-up-more[
+```{r, plot-slack-3a, echo = F, fig.dim=c(7, 7), out.width="100%"}
+gg_nosep
+```
+]
+
+.less-right.move-up[
+For $\color{#e64173}{\epsilon_i} \ge 1:$
+
+- $M \left( 1 - \color{#e64173}{\epsilon_i} \right) < 0$
+- Wrong side of hyperplane
+- Pays cost $\epsilon_i$
+- Distance $\lesseqqgtr M$
+- .ex[Examples?]
+]
+
+---
+
+$$
+\begin{align}
+  \color{#FFA500}{y_i} \left( \color{#6A5ACD}{\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip}} \right) \ge M \left( 1 - \color{#e64173}{\epsilon_i} \right),
+  \quad
+  \color{#e64173}{\epsilon_i} \ge 0,
+  \quad
+  \sum_{i=1}^{n} \color{#e64173}{\epsilon_i} \le C
+\end{align}
+$$
+
+.more-left.move-up-more[
+```{r, plot-slack-3b, echo = F, fig.dim=c(7, 7), out.width="100%"}
+gg_nosep
+```
+]
+
+.less-right.move-up[
+For $\color{#e64173}{\epsilon_i} \ge 1:$
+
+- $M \left( 1 - \color{#e64173}{\epsilon_i} \right) < 0$
+- Wrong side of hyperplane
+- Pays cost $\epsilon_i$
+- Distance $\lesseqqgtr M$
+- .ex[Ex:] .small[.purple[4], .orange[5], .orange[7], .orange[8]]
+]
+
+---
+
+$$
+\begin{align}
+  \color{#FFA500}{y_i} \left( \color{#6A5ACD}{\beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip}} \right) \ge M \left( 1 - \color{#e64173}{\epsilon_i} \right),
+  \quad
+  \color{#e64173}{\epsilon_i} \ge 0,
+  \quad
+  \sum_{i=1}^{n} \color{#e64173}{\epsilon_i} \le C
+\end{align}
+$$
+
+.more-left.move-up-more[
+```{r, plot-slack-4, echo = F, fig.dim=c(7, 7), out.width="100%"}
+gg_nosep
+```
+]
+
+.less-right.move-up[
+.b[Support vectors]
+
+- On margin
+- Violate margin
+- Wrong side of hyperplane
+
+determine the classifier.
+]
+
+---
+layout: true
+# Support vector machines
+## Support vector classifier
+
+---
+The tuning parameter $C$ determines how much *slack* we allow.
+
+$C$ is our budget for violating the margin—including observations on the wrong side of the hyperplane.
+
+--
+
+.col-left[
+.note[Case 1:] $C=0$
+- We allow no violations.
+- Maximal margin hyperplane.
+- Trains on few obs.
+]
+
+--
+
+.col-right[
+.note[Case 2:] $C>0$
+- $\le C$ violations of hyperplane.
+- *Softens* margins
+- Larger $C$ uses more obs.
+]
+
+--
+
+.clear-up[
+We tune $C$ via CV to balance low bias (low $C$) and low variance (high $C$).
+]
+
+---
+layout: true
+class: clear
+
+---
+exclude: true
+
+```{r, est-svm-hilo, include = F}
+# New dataset (more observations)
+set.seed(123)
+ns_dt = nosep_dt %>% sample_n(50) %>%
+mutate(
+  y = if_else(above == T, 1, -1),
+  above_fac = factor(above)
+)
+# Train models
+nosep_lo = svm(
+  above_fac ~ x1 + x2,
+  data = ns_dt,
+  kernel = "linear",
+  degree = 1,
+  cost = 100,
+  scale = F
+)
+nosep_hi = svm(
+  above_fac ~ x1 + x2,
+  data = ns_dt,
+  kernel = "linear",
+  degree = 1,
+  cost = 0.0001,
+  scale = F
+)
+# Coefficients
+bh0 = coef(nosep_hi)[1]
+bh1 = coef(nosep_hi)[2]
+bh2 = coef(nosep_hi)[3]
+bl0 = coef(nosep_lo)[1]
+bl1 = coef(nosep_lo)[2]
+bl2 = coef(nosep_lo)[3]
+```
+
+---
+
+Starting with a low budget $(C)$.
+
+```{r, fig-nosep-l, echo = F}
+# Plot
+ggplot(
+  data = ns_dt,
+  aes(x1, x2, color = above)
+) +
+geom_point(size = 3.5, alpha = 0.8) +
+geom_ribbon(
+  data = tibble(
+    x = c(-100, 100),
+    ymin = -(bl0 - 1)/bl2 -bl1/bl2 * x,
+    ymax = -(bl0 + 1)/bl2 -bl1/bl2 * x
+  ),
+  aes(x = x, y = x, ymin = ymin, ymax = ymax, color = NA),
+  fill = "black", alpha = 0.1
+) +
+geom_point(
+  data = ns_dt[nosep_lo$index,],
+  color = "black",
+  shape = 1,
+  size = 4,
+  stroke = 0.5
+) +
+geom_abline(intercept = -bl0/bl2, slope = -bl1/bl2, color = red_pink, size = 1) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+
+---
+
+Now for a high budget $(C)$.
+
+```{r, fig-nosep-h, echo = F}
+# Plot
+ggplot(
+  data = ns_dt,
+  aes(x1, x2, color = above)
+) +
+geom_point(size = 3.5, alpha = 0.8) +
+geom_ribbon(
+  data = tibble(
+    x = c(-100, 100),
+    ymin = -(bh0 - 1)/bh2 -bh1/bh2 * x,
+    ymax = -(bh0 + 1)/bh2 -bh1/bh2 * x
+  ),
+  aes(x = x, y = x, ymin = ymin, ymax = ymax, color = NA),
+  fill = "black", alpha = 0.1
+) +
+geom_point(
+  data = ns_dt[nosep_hi$index,],
+  color = "black",
+  shape = 1,
+  size = 4,
+  stroke = 0.5
+) +
+geom_abline(intercept = -(bh0)/(bh2), slope = -(bh1)/(bh2), color = red_pink, size = 1) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+
+---
+class: middle
+
+The .hi[support-vector classifier] extends the .hi[maximal-margin classifier]:
+
+1. Allowing for .b[misclassification]
+  - Observations on the *wrong side of the hyperplane*.
+  - Situations where there is no separating hyperplane.
+
+1. Permitting .b[violations of the margin].
+
+1. Typically using .b[more observations] to determine decision boundary.
+
+---
+class: middle
+
+However, we still are using a (single) linear boundary between our classes.
+
+---
+exclude: true
+
+
+
+```{r, data-nonlin, include = F, cache = T}
+# Sample some data
+set.seed(12345)
+nonlin_dt = nosep_dt[between(x1, x2 - 60, x2 + 60), .(x1, x2)] %>%
+  sample_n(99) %T>% setDT()
+# Create ranking
+nonlin_dt[, tmp := x1 + x2]
+setorder(nonlin_dt, tmp)
+nonlin_dt[, above := rep(c(F, T, F), each = 33)]
+nonlin_dt[, above_fac := above %>% factor()]
+# Linear SVM for nonlinear data
+nonlin_lin_cv = tune.svm(
+  above_fac ~ x1 + x2,
+  data = nonlin_dt,
+  kernel = "linear",
+  degree = 1,
+  cost = c(0.001, 0.01, 0.1, 1:3, 10, 100),
+  tunecontrol = tune.control(cross = 5),
+  scale = F
+)
+nonlin_lin_svm = svm(
+  above_fac ~ x1 + x2,
+  data = nosep_sub,
+  kernel = "linear",
+  degree = 1,
+  cost = nonlin_lin_cv$best.parameters$cost,
+  scale = F
+)
+bnl0 = coef(nonlin_lin_svm)[1]
+bnl1 = coef(nonlin_lin_svm)[2]
+bnl2 = coef(nonlin_lin_svm)[3]
+# Cross validate
+nonlin_poly_cv = tune.svm(
+  above_fac ~ x1 + x2 + I(x1^2),
+  data = nonlin_dt,
+  kernel = "linear",
+  degree = 1,
+  cost = c(0.001, 0.01, 0.1),
+  tunecontrol = tune.control(cross = 5),
+  scale = F
+)
+nonlin_poly_svm = svm(
+  above_fac ~ x1 + x2 + I(x1^2),
+  data = nosep_sub,
+  kernel = "linear",
+  degree = 1,
+  cost = nonlin_poly_cv$best.parameters$cost,
+  scale = F
+)
+p0 = coef(nonlin_poly_svm)[1]
+p1 = coef(nonlin_poly_svm)[2]
+p2 = coef(nonlin_poly_svm)[3]
+p3 = coef(nonlin_poly_svm)[4]
+```
+
+---
+
+.ex[Ex:] Some data
+
+```{r, plot-nonlin-data, echo = F}
+# Plot
+ggplot(
+  data = nonlin_dt,
+  aes(x1, x2, color = above)
+) +
+geom_point(size = 3.5, alpha = 0.8) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+---
+
+.ex[Ex:] Some data don't really work with .pink[*linear* decision boundaries].
+
+```{r, plot-nonlin-lin-svm, echo = F}
+# Plot
+ggplot(
+  data = nonlin_dt,
+  aes(x1, x2, color = above)
+) +
+geom_ribbon(
+  data = tibble(
+    x = c(-100, 100),
+    ymin = -(bnl0 - 1)/bnl2 -bnl1/bnl2 * x,
+    ymax = -(bnl0 + 1)/bnl2 -bnl1/bnl2 * x
+  ),
+  aes(x = x, y = x, ymin = ymin, ymax = ymax, color = NA),
+  fill = "black", alpha = 0.1
+) +
+geom_abline(intercept = bnl0/(-bnl2), slope = bnl1/(-bnl2), color = red_pink, size = 1) +
+geom_point(size = 3.5, alpha = 0.8) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+---
+
+.ex[Ex:] Some data may have .pink[*non-linear* decision boundaries].
+
+```{r, plot-nonlin-quad-svm, echo = F}
+p_fun = function(x) -1/p2 * (p0 + p1 * x + p3 * x^2)
+p_fun_hi = function(x) -1/p2 * (p0 - 1 + p1 * x + p3 * x^2)
+p_fun_lo = function(x) -1/p2 * (p0 + 1 + p1 * x + p3 * x^2)
+# Plot
+ggplot(
+  data = data.frame(x = c(-100, 100)),
+  aes(x)
+) +
+stat_function(
+  aes(x),
+  fun = p_fun,
+  n = 100,
+  geom = "line",
+  color = red_pink,
+  size = 1
+) +
+geom_ribbon(
+  data = tibble(
+    x = seq(-100, 100, by = 1),
+    ymin = p_fun_lo(x),
+    ymax = p_fun_hi(x)
+  ),
+  aes(x = x, ymin = ymin, ymax = ymax),
+  fill = "black", alpha = 0.1
+) +
+geom_point(
+  data = nonlin_dt,
+  aes(x1, x2, color = above),
+  size = 3.5, alpha = 0.8
+) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+---
+
+.ex[Ex:] We could probably do even better with more flexibility.
+
+```{r, plot-nonlin-quad-svm2, echo = F}
+p_fun = function(x) -1/p2 * (p0 + p1 * x + p3 * x^2)
+p_fun_hi = function(x) -1/p2 * (p0 - 1 + p1 * x + p3 * x^2)
+p_fun_lo = function(x) -1/p2 * (p0 + 1 + p1 * x + p3 * x^2)
+# Plot
+ggplot(
+  data = data.frame(x = c(-100, 100)),
+  aes(x)
+) +
+stat_function(
+  aes(x),
+  fun = p_fun,
+  n = 100,
+  geom = "line",
+  color = red_pink,
+  size = 1
+) +
+geom_ribbon(
+  data = tibble(
+    x = seq(-100, 100, by = 1),
+    ymin = p_fun_lo(x),
+    ymax = p_fun_hi(x)
+  ),
+  aes(x = x, ymin = ymin, ymax = ymax),
+  fill = "black", alpha = 0.1
+) +
+geom_point(
+  data = nonlin_dt,
+  aes(x1, x2, color = above),
+  size = 3.5, alpha = 0.8
+) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+---
+layout: true
+# Support vector machines
+
+---
+name: the-svm
+## Flexibility
+
+In the regression setting, we increase our model's flexiblity by adding polynomials in our predictors, _e.g._, $\hat{y}_i = \hat{\beta}_0  + \hat{\beta}_1 x_i + \hat{\beta}_2 x_i^2 + \hat{\beta}_3 x_i^3$.
+
+--
+
+We can apply a very similar idea to our support vector classifier.
+
+.note[Previously:] Train the classifier on $X_1, X_2, \ldots, X_p$.
+
+.note[Idea:] Train the classifier on $X_1, X_1^2, X_2, X_2^2 \ldots, X_p, X_p^2$ (and so on).
+
+--
+
+The new classifier has a .b[linear decision boundary] in the expanded space.
+
+--
+
+The boundary is going to be .b[nonlinear] within the original space.
+
+---
+name: the-svm
+## Introducing
+
+The .attn[support vector machine] runs with this idea of expanded flexiblity.
+
+(Why stop at quadratic functions—or polynomials?)
+
+Support vector machines .b[train a support vector classifier] on .b[expanded feature].super[.pink[†]] .b[spaces] that result from applying .attn[kernels] to the original features.
+
+.footnote[
+.pink[†] feature = predictor
+]
+
+---
+name: inner
+## Dot products
+
+It turns out that solving the support vector classifier only involves the
+<br>.attn[dot product] of our observations.
+
+The .attn[dot product] of two vectors is defined as
+$$
+\begin{align}
+  \langle a,b \rangle = a_1 b_1 + a_2 b_2 + \cdots + a_p b_p = \sum_{i=1}^p a_i b_i
+\end{align}
+$$
+
+--
+
+.ex[Ex:] The dot product of $a$ = (1,2) and $b$ = (3,4) is $\langle a,b \rangle$ = 1×3 + 2×4 = 11.
+
+--
+
+Dot products are often pitched as a measure of two vectors' similarity.
+
+
+---
+## Dot products and the SVC
+
+We can write the linear support vector classifier as
+$$
+\begin{align}
+  f(x) = \beta_0 + \sum_{i=1}^n \alpha_i \langle x,x_i \rangle
+\end{align}
+$$
+and we fit the $(n)$ $\alpha_i$ and $\beta_0$ with the training observations' dot products..super[.pink[†]]
+
+.footnote[
+.pink[†] The actually fitting is beyond what we're doing today.
+]
+
+--
+
+As you might guess, $\alpha_i\neq 0$ only for support-vector obsevations.
+
+---
+name: svm-gen
+## Generalizing
+
+.note[Recall:] Linear support vector classifier $f(x) = \beta_0 + \sum_{i=1}^n \alpha_i \langle x,x_i \rangle$
+
+--
+
+.attn[Support vector machines] generalize this linear classifier by simply replacing $\langle x,x_i \rangle$ with (non-linear) .attn[kernel functions].super[.pink[†]] $K(x_i,x_{i'})$.
+
+.footnote[
+.pink[†] Or just .it[kernels].
+]
+
+--
+
+These magical .attn[kernel functions] are various ways to measure similarity between observations.
+
+--
+
+- .note[Linear kernel:] $K(x_i,x_{i'}) = \sum_{i=1}^p x_{i,j} x_{i',j}$  .grey-light[(back to SVC)]
+
+--
+
+- .note[Polynomial kernel:] $K(x_i,x_{i'}) = \left( 1 + \sum_{i=1}^p x_{i,j} x_{i',j} \right)^2$
+
+--
+
+- .note[Radial kernel:] $K(x_i,x_{i'}) = \mathop{\text{exp}}\left( -\gamma \sum_{j=1}^p \left( x_{i,j} - x_{i',j} \right)^2 \right)$
+
+---
+layout: true
+class: clear
+
+---
+exclude: true
+
+```{r, train-lin-svm, include = F, cache = T}
+set.seed(12345)
+# Linear
+svm_lin = train(
+  above_fac ~ x1 + x2 + x1:x2,
+  data = nonlin_dt,
+  method = "svmLinear",
+  scaled = T,
+  trControl = trainControl(method = "cv", number = 5),
+  tuneGrid = data.frame(
+    C = 10^seq(-1, 2, by = 0.1)
+  )
+)
+```
+
+```{r, train-poly-svm, include = F, cache = T}
+set.seed(12345)
+# Polynomial
+svm_poly = train(
+  above_fac ~ x1 + x2,
+  data = nonlin_dt,
+  method = "svmPoly",
+  scaled = T,
+  trControl = trainControl(method = "cv", number = 5),
+  tuneGrid = expand.grid(
+    degree = 2:4,
+    scale = T,
+    C = 10^seq(-2, 1, by = 0.5)
+  )
+)
+```
+
+```{r, train-radial-svm, include = F, cache = T}
+set.seed(12345)
+# Radial
+svm_radial = train(
+  above_fac ~ x1 + x2,
+  data = nonlin_dt,
+  method = "svmRadial",
+  scaled = T,
+  trControl = trainControl(method = "cv", number = 5),
+  tuneGrid = expand.grid(
+    sigma = c(0.1, 1, 5, 10, 20),
+    C = 10^seq(-2, 1, by = 1)
+  )
+)
+```
+
+```{r, train-radial-svm-sigma, include = F, cache = T}
+set.seed(12345)
+# Radial
+svm_radial_sigma = train(
+  above_fac ~ x1 + x2,
+  data = nonlin_dt,
+  method = "svmRadial",
+  scaled = T,
+  trControl = trainControl(method = "cv", number = 5),
+  tuneGrid = expand.grid(
+    sigma = c(50, 100, 1000),
+    C = 10^seq(1, 3, by = 0.5)
+  )
+)
+```
+
+---
+
+Our example data.
+
+```{r, plot-data-nonlin, echo = F}
+ggplot(
+  data = nonlin_dt,
+  aes(x1, x2, color = above)
+) +
+geom_point(size = 3.5, alpha = 0.8) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+
+---
+
+With a linear kernel *plus* and interaction between $X_1$ and $X_2$..super[.pink[†]]
+
+.footnote[
+.pink[†] Exciting!!
+]
+
+
+```{r, plot-svm-lin-kern, echo = F}
+# Dataset for grid
+grid_dt = expand.grid(x1 = seq(-100, 100, by = 0.5), x2 = seq(-100, 100, by = 0.5)) %T>% setDT()
+# The plot
+ggplot(
+  data = nonlin_dt,
+  aes(x1, x2, color = above)
+) +
+geom_raster(
+  aes(fill = above),
+  data =  grid_dt[, .(
+    x1, x2,
+    above = predict(svm_lin, newdata = grid_dt)
+  )],
+  alpha = 0.3,
+  color = NA,
+  interpolate = T
+) +
+geom_point(size = 3.5, alpha = 0.8) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+scale_fill_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+
+---
+
+Polynomial kernel (of degree `r svm_poly$bestTune$degree`).
+
+```{r, plot-svm-poly-kern, echo = F}
+ggplot(
+  data = nonlin_dt,
+  aes(x1, x2, color = above)
+) +
+geom_raster(
+  aes(fill = above),
+  data =  grid_dt[, .(
+    x1, x2,
+    above = predict(svm_poly, newdata = grid_dt)
+  )],
+  alpha = 0.3,
+  color = NA,
+  interpolate = T
+) +
+geom_point(size = 3.5, alpha = 0.8) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+scale_fill_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+
+---
+
+And now for the radial kernel!
+
+```{r, plot-svm-radial-kern, echo = F}
+ggplot(
+  data = nonlin_dt,
+  aes(x1, x2, color = above)
+) +
+geom_raster(
+  aes(fill = above),
+  data =  grid_dt[, .(
+    x1, x2,
+    above = predict(svm_radial, newdata = grid_dt)
+  )],
+  alpha = 0.3,
+  color = NA,
+  interpolate = T
+) +
+geom_point(size = 3.5, alpha = 0.8) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+scale_fill_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+
+---
+
+Very small $\gamma$ forces radial kernel to be *even more* local.
+
+```{r, plot-svm-radial-kern-sigma, echo = F}
+ggplot(
+  data = nonlin_dt,
+  aes(x1, x2, color = above)
+) +
+geom_raster(
+  aes(fill = above),
+  data =  grid_dt[, .(
+    x1, x2,
+    above = predict(svm_radial_sigma, newdata = grid_dt)
+  )],
+  alpha = 0.3,
+  color = NA,
+  interpolate = T
+) +
+geom_point(size = 3.5, alpha = 0.8) +
+scale_x_continuous(expression(X[1])) +
+scale_y_continuous(expression(X[2])) +
+scale_color_manual(values = c(purple, orange)) +
+scale_fill_manual(values = c(purple, orange)) +
+theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
+theme(legend.position = "none") +
+coord_equal(xlim = c(-100,100), ylim = c(-100, 100))
+```
+
+---
+layout: true
+# Support vector machines
+
+---
+## More generalizing
+
+So why make a big deal of kernels? Anyone can transform variables.
+
+--
+
+While anyone can transform variables, you cannot transform variables to cover all spaces that our kernels cover.
+
+--
+
+For example, the feature space of the radial kernel is infinite dimensional..super[.pink[†]]
+
+.footnote[
+.pink[†] And implicit
+]
+
+--
+
+```{r, bill-nye, echo = F}
+knitr::include_graphics("images/bill.gif")
+```
+
+---
+name: svm-r
+## In R
+
+As you probably guessed, `parsnip` offers several SVM options..super[†]
+
+- .b.pink[Linear].super[††] <br> .pink[`svm_linear(cost)`] with `"LiblineaR"` engine
+
+- .b.orange[Polynomial] <br> .orange[`svm_poly(cost, degree, scale_factor)`] with `"kernlab"` engine
+
+- .b.purple[Radial] <br> .purple[`svm_rbf(cost, rbf_sigma, scale_factor)`] with `"kernlab"` engine
+
+You can also find more kernels in the actual packages (or other packages).
+
+.footnote[
+.pink[†] `e1071` is another popular R package for SVMs, but it does not work with `tidymodels`.
+<br>
+.pink[††] Remember that you can still add interactions with the linear kernel.
+]
+
+---
+layout: false
+class: clear, middle
+
+.note[Note:] Costs have units. You often want to center/scale your variables.
+
+---
+# Support vector machines
+## In R
+
+For a real example let's go back to the heart disease dataset.
+- Load the data.
+- Add a recipe .b[with normalization].
+- Define the CV splits.
+
+---
+# Support vector machines
+## In R
+
+For a real example let's go back to the heart disease dataset.
+
+```{r, load-heart-data}
+# Load the dataset
+heart_df = read_csv("Heart.csv") %>%
+  dplyr::select(-1) %>%
+  rename(HeartDisease = AHD) %>%
+  clean_names()
+# Define the recipe w/ imputation, dummies, and normalization
+heart_recipe = recipe(heart_disease ~ ., data = heart_df) %>% 
+  step_impute_median(all_predictors() & all_numeric()) %>% 
+  step_impute_mode(all_predictors() & all_nominal()) %>% 
+  step_dummy(all_predictors() & all_nominal()) %>% 
+  step_normalize(all_predictors())
+# Define CV
+set.seed(12345)
+heart_splits = heart_df %>% vfold_cv(v = 5)
+```
+
+---
+layout: false
+class: clear, middle
+
+.note[Note] The actual linear SVM function `linear_svm()` is under development and isn't working quite right. First-degree polynomial *is* linear.
+
+---
+layout: false
+class: clear
+
+.b.pink[SVM with linear kernel]
+
+Define the .pink[model] and workflow—tuning $C$.
+
+.col-left[
+```{r, model-svm-linear}
+# The linear-SVM model
+heart_linear = svm_poly(
+  mode = "classification",
+  cost = tune(),
+  degree = 1
+) %>% set_engine("kernlab")
+# The linear-SVM workflow
+wf_linear_svm = workflow() %>% 
+  add_model(heart_linear) %>% 
+  add_recipe(heart_recipe)
+```
+]
+
+.col-right[
+```{r, tune-svm-linear, cache = T}
+# Tune the linear SVM
+tuning_linear_svm = tune_grid(
+  wf_linear_svm,
+  heart_splits,
+  grid = data.frame(
+    cost = 10^seq(-4, 2, length = 10)
+  ),
+  metrics = metric_set(
+    f_meas, accuracy
+  )
+)
+```
+]
+
+---
+class: clear
+
+.b[Performance of .pink[linear-kernel SVMs]]
+
+```{r, plot-svm-linear, echo = F}
+ggplot(
+  data = tuning_linear_svm %>% collect_metrics() %>% clean_names(),
+  aes(x = cost, y = mean, color = metric)
+) +
+geom_line(size = 0.5) +
+geom_point(size = 4.5) +
+scale_x_log10("Cost", labels = scales::comma) +
+scale_y_continuous("Performance") +
+theme_minimal(base_family = "Fira Sans Book", base_size = 18) +
+scale_color_manual(
+  "Metric",
+  values = c(slate, purple),
+  labels = c("Accuracy", "F Measure")
+) +
+theme(legend.position = "bottom")
+```
+
+---
+layout: false
+class: clear
+
+.b.orange[SVM with polynomial kernel]
+
+Define the .orange[model] and workflow—tuning $C$ *and* `degree`.
+
+.col-left[
+```{r, model-svm-poly}
+# The linear-SVM model
+heart_poly = svm_poly(
+  mode = "classification",
+  cost = tune(),
+  degree = tune()
+) %>% set_engine("kernlab")
+# The linear-SVM workflow
+wf_poly_svm = workflow() %>% 
+  add_model(heart_poly) %>% 
+  add_recipe(heart_recipe)
+```
+]
+
+.col-right[
+```{r, tune-svm-poly, cache = T}
+# Tune the linear SVM
+tuning_poly_svm = tune_grid(
+  wf_poly_svm,
+  heart_splits,
+  grid = expand_grid(
+    cost = 10^seq(-4, 2, length = 10),
+    degree = 1:3
+  ),
+  metrics = metric_set(
+    f_meas, accuracy
+  )
+)
+```
+]
+
+---
+class: clear
+
+.b[*Accuracy* of .orange[polynomial-kernel SVMs]]
+
+```{r, plot-rbf-poly, echo = F}
+ggplot(
+  data = tuning_poly_svm %>% collect_metrics() %>% clean_names() %>% dplyr::filter(metric == "accuracy"),
+  aes(x = cost, y = mean, color = as.character(degree))
+) +
+geom_line(size = 0.5) +
+geom_point(size = 4.5) +
+scale_x_log10("Cost", labels = scales::comma) +
+scale_y_continuous("Accuracy") +
+theme_minimal(base_family = "Fira Sans Book", base_size = 18) +
+scale_color_manual(
+  "Degree",
+  values = c(slate, orange, red_pink)
+) +
+theme(legend.position = "bottom")
+```
+
+---
+layout: false
+class: clear
+
+.b.purple[SVM with RBF kernel]
+
+Define the .orange[model] and workflow—tuning $C$ *and* `degree`.
+
+.col-left[
+```{r, model-svm-rbf}
+# The linear-SVM model
+heart_rbf = svm_rbf(
+  mode = "classification",
+  cost = tune(),
+  rbf_sigma = tune()
+) %>% set_engine("kernlab")
+# The linear-SVM workflow
+wf_rbf_svm = workflow() %>% 
+  add_model(heart_rbf) %>% 
+  add_recipe(heart_recipe)
+```
+]
+
+.col-right[
+```{r, tune-svm-rbf, cache = T}
+# Tune the linear SVM
+tuning_rbf_svm = tune_grid(
+  wf_rbf_svm,
+  heart_splits,
+  grid = expand_grid(
+    cost = 10^seq(-4, 2, length = 10),
+    rbf_sigma = 10^c(-3:0)
+  ),
+  metrics = metric_set(
+    f_meas, accuracy
+  )
+)
+```
+]
+
+---
+class: clear
+
+.b[*Accuracy* of .purple[RBF-kernel SVMs]]
+
+```{r, plot-svm-rbf, echo = F}
+ggplot(
+  data = tuning_rbf_svm %>% collect_metrics() %>% clean_names() %>% dplyr::filter(metric == "accuracy"),
+  aes(x = cost, y = mean, color = as.character(rbf_sigma))
+) +
+geom_line(size = 0.5) +
+geom_point(size = 4.5) +
+scale_x_log10("Cost", labels = scales::comma) +
+scale_y_continuous("Accuracy") +
+theme_minimal(base_family = "Fira Sans Book", base_size = 18) +
+scale_color_manual(
+  "RBF Sigma",
+  values = c(slate, orange, red_pink, purple)
+) +
+theme(legend.position = "bottom")
+```
+
+---
+layout: false
+name: multiclass
+# Support vector machines
+## Multi-class classification
+
+You will commonly see SVMs applied in settings with $K>2$ classes.
+
+--
+
+What can we do?
+--
+ We have options!
+
+--
+
+.attn[One-versus-one classification]
+
+- Compares each *pair* of classes, one pair at a time.
+- Final prediction comes from the most-common pairwise prediction.
+
+--
+
+.attn[One-versus-all classification]
+
+- Fits $K$ unique SVMs—one for each class: $k$ *vs.* not $k$.
+- Predicts the class for which $\mathop{f}_k(x)$ is largest.
+
+---
+name: more
+layout: false
+# SVM
+## More material
+
+Visualizing decision boundaries
+- [From `scikit-learn`](https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html)
+- [From sub-subroutine](http://www.subsubroutine.com/sub-subroutine/2016/2/15/understanding-machine-learning-techniques-by-the-decision-boundaries-they-are-capable-of)
+
+[The `kernlab` paper](https://cran.r-project.org/web/packages/kernlab/vignettes/kernlab.pdf) (describes kernel parameters)
+
+[*A Practical Guide to Support Vector Classification*](https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf)
+
+.note[Next:]
+- Prep: [A nice neural-net video](https://www.youtube.com/watch?v=aircAruvnKk)
+- Fun: [A neural-net playground](https://playground.tensorflow.org)
+
+---
+name: svr
+layout: false
+# SV Regression
+## Extending SVM regression problems
+
+You can extend this SVM idea to regression settings.
+
+.note[Recall] OLS regression chooses $\beta$s to minimize SSE-based loss.
+
+SV regression chooses $\beta$s to minimize loss based upon residuals .it[larger than some defined magnitude] (think: the margin).
+
+---
+name: sources
+layout: false
+# Sources
+
+These notes draw upon
+
+- [An Introduction to Statistical Learning](http://faculty.marshall.usc.edu/gareth-james/ISL/) (*ISL*)<br>James, Witten, Hastie, and Tibshirani
+---
+# Table of contents
+
+.col-left[
+.smallest[
+#### Admin
+- [Today and upcoming](#admin)
+
+#### Other
+- [More materials](#more)
+- [Sources/references](#sources)
+]
+]
+
+.col-right[
+.smallest[
+#### SVM
+1. [Intro](#intro)
+1. [Hyperplanes](#hyperplanes)
+1. [Hyperplanes and classification](#sep-class)
+1. [Which hyperplane? (The maximal margin)](#which-hyperplane)
+1. [Soft margins](#soft-margins)
+1. [The support vector classifier](#svc)
+1. [Support vector machines](#the-svm)
+  - [Intro](#the-svm)
+  - [Dot products](#inner)
+  - [Generalization](#svm-gen)
+  - [In R](#svm-r)
+1. [Multi-class classification](#multiclass)
+1. [SV Regression](#svr)
+]
+]

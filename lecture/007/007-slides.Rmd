@@ -55,7 +55,10 @@ options(device = function(file, width, height) {
   svg(tempfile(), width = width, height = height)
 })
 options(knitr.table.format = "html")
+# A few extras
+xaringanExtra::use_xaringan_extra(c("tile_view", "fit_screen"))
 ```
+
 ---
 layout: true
 # Admin
