@@ -85,16 +85,16 @@ Submit a short evaluation of whether you and your group-member equally distribut
 |----|----------|-----------|-----------|-------------|
 | 1  | Zoe Arnaut-Hull | Octavio De Lima | Cyrus Tadjiki | Spam emails |
 | 2  | Afnan Alharbi | Ryan Fox | Erin Speltz | EV sales |
-| 3  | Tracy Bishop | Luke Coury |  | El Niño |
+| 3  | Tracy Bishop | Luke Coury |  | Labor-force participation (OR) |
 | 4  | Hannah Grubbs | Purushothaman Padmanabhan | Jay Schmidt | Winter Olympics medals |
-| 5  |  |  |  |  |
-| 6  |  |  |  |  |
-| 7  |  |  |  |  |
-| 8  |  |  |  |  |
-| 9  |  |  |  |  |
-| 10 |  |  |  |  |
-| 11 |  |  |  |  |
-| 12 |  |  |  |  |
-| 13 |  |  |  |  |
-| 14 |  |  |  |  |
+| 5  | Erik Andersen |  |  | MLB wins by team |
+| 6  | Connor Burton |  |  | Green energy investment |
+| 7  | Alex Bespalov | Jadon Schmitt |  | Stroke prediction |
+| 8  | Coraline Best | Walid Kurdi | Niels Mayer | Parkinson's disease |
+| 9  | Jeremy Patak |  |  | NBA wins |
+| 10 | Nathan Bracken | Micah Klein |  | Stationarity |
+| 11 | Aidan Bergsman | Campbell Miller |  | Rainfall |
+| 12 | Hans Elliott | Santiago Giordano |  | Late arrivals |
+| 13 | Eliana Squire | Natalie Walker |  | Vaccination rates |
+| 14 | Rhodes Kikrpatrick | Ben Noon |  | Poverty |
 | 15 |  |  |  |  |

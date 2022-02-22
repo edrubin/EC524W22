@@ -424,7 +424,7 @@ We can use `tidymodels` plus the `baguette` package to bag trees.
 --
 
 .col-left[
-.b[Function:] `bag_treebag()`
+.b[Function:] `bag_tree()`
 - "Specifies" model for `parsnip`.
 ]
 
@@ -448,7 +448,7 @@ count: false
 We can use `tidymodels` plus the `baguette` package to bag trees.
 
 .col-left[
-.b[Function:] `bag_treebag()`
+.b[Function:] `bag_tree()`
 - "Specifies" model for `parsnip`.
 - `mode`: class., reg., or unknown
 ]
@@ -473,7 +473,7 @@ count: false
 We can use `tidymodels` plus the `baguette` package to bag trees.
 
 .col-left[
-.b[Function:] `bag_treebag()`
+.b[Function:] `bag_tree()`
 - "Specifies" model for `parsnip`.
 - `mode`: class., reg., or unknown
 - `cost_complexity`: the penalty for model complexity (`Cp`)
@@ -499,7 +499,7 @@ count: false
 We can use `tidymodels` plus the `baguette` package to bag trees.
 
 .col-left[
-.b[Function:] `bag_treebag()`
+.b[Function:] `bag_tree()`
 - "Specifies" model for `parsnip`.
 - `mode`: class., reg., or unknown
 - `cost_complexity`: the penalty for model complexity (`Cp`)
@@ -526,7 +526,7 @@ count: false
 We can use `tidymodels` plus the `baguette` package to bag trees.
 
 .col-left[
-.b[Function:] `bag_treebag()`
+.b[Function:] `bag_tree()`
 - "Specifies" model for `parsnip`.
 - `mode`: class., reg., or unknown
 - `cost_complexity`: the penalty for model complexity (`Cp`)
@@ -554,7 +554,7 @@ count: false
 We can use `tidymodels` plus the `baguette` package to bag trees.
 
 .col-left[
-.b[Function:] `bag_treebag()`
+.b[Function:] `bag_tree()`
 - "Specifies" model for `parsnip`.
 - `mode`: class., reg., or unknown
 - `cost_complexity`: the penalty for model complexity (`Cp`)
@@ -583,7 +583,7 @@ count: false
 We can use `tidymodels` plus the `baguette` package to bag trees.
 
 .col-left[
-.b[Function:] `bag_treebag()`
+.b[Function:] `bag_tree()`
 - "Specifies" model for `parsnip`.
 - `mode`: class., reg., or unknown
 - `cost_complexity`: the penalty for model complexity (`Cp`)
@@ -616,7 +616,7 @@ count: false
 We can use `tidymodels` plus the `baguette` package to bag trees.
 
 .col-left[
-.b[Function:] `bag_treebag()`
+.b[Function:] `bag_tree()`
 - "Specifies" model for `parsnip`.
 - `mode`: class., reg., or unknown
 - `cost_complexity`: the penalty for model complexity (`Cp`)
@@ -760,7 +760,7 @@ ggplot(
 ) +
 geom_line() +
 scale_y_continuous("Accuracy", labels = scales::percent) +
-scale_x_continuous("Number of trees") +
+scale_x_continuous("Number of trees", labels = scales::comma) +
 scale_color_manual("[Method, Estimate]", values = c(red_pink, purple)) +
 theme_minimal(base_size = 20, base_family = "Fira Sans Book") +
 theme(legend.position = "bottom") +
@@ -1339,7 +1339,7 @@ ggplot(
 ) +
 geom_line() +
 scale_y_continuous("Accuracy", labels = scales::percent) +
-scale_x_continuous("Number of trees") +
+scale_x_continuous("Number of trees", labels = scales::comma) +
 scale_color_manual(
   "[Method, Estimate]",
   values = c(red_pink, purple, orange, slate)
@@ -1493,7 +1493,7 @@ heart_boost = train(
     number = 5
   ),
   tuneGrid = expand.grid(
-    "n.trees" = seq(1, 1e3, by = 1),
+    "n.trees" = seq(1, 1e4, by = 1),
     "interaction.depth" = 1:3,
     "shrinkage" = c(0.1, 0.01, 0.001),
     "n.minobsinnode" = 5
@@ -1765,7 +1765,7 @@ ggplot(
 geom_vline(xintercept = 204, size = 1.3, alpha = 0.3, color = red_pink) +
 geom_line(size = 0.4) +
 scale_y_continuous("Accuracy", labels = percent) +
-scale_x_continuous("Number of trees") +
+scale_x_continuous("Number of trees", labels = scales::comma) +
 scale_color_viridis_d("Tree depth", option = "magma", end = 0.85) +
 scale_linetype_manual("Shrinkage", values = c("longdash", "dotted", "solid")) +
 theme_minimal(base_size = 18, base_family = "Fira Sans Book")
@@ -1779,7 +1779,7 @@ class: clear
 
 ```{r, plot-boost-param-more, echo = F}
 ggplot(
-  data = heart_boost$results %>% mutate(grp = paste(shrinkage, interaction.depth, sep = ", ")),
+  data = heart_boost$results %>% mutate(grp = paste(shrinkage, interaction.depth, sep = ", ")) %>% filter(n.trees <= 1e3) %>% filter(n.trees %in% seq(1, 1e4, by = 5)),
   aes(
     x = n.trees,
     y = Accuracy,
@@ -1791,7 +1791,59 @@ geom_vline(xintercept = 204, size = 1.3, alpha = 0.15, color = red_pink) +
 geom_vline(xintercept = 606, size = 1.3, alpha = 0.3, color = red_pink) +
 geom_line(size = 0.4) +
 scale_y_continuous("Accuracy", labels = percent) +
-scale_x_continuous("Number of trees") +
+scale_x_continuous("Number of trees", labels = scales::comma) +
+scale_color_viridis_d("Tree depth", option = "magma", end = 0.85) +
+scale_linetype_manual("Shrinkage", values = c("longdash", "dotted", "solid")) +
+theme_minimal(base_size = 18, base_family = "Fira Sans Book")
+```
+
+---
+layout: false
+class: clear
+
+.b[Comparing boosting parameters]—even more trees!
+
+```{r, plot-boost-param-even-more, echo = F}
+ggplot(
+  data = heart_boost$results %>% mutate(grp = paste(shrinkage, interaction.depth, sep = ", ")) %>% filter(n.trees %in% seq(1, 1e4, by = 15) | n.trees == 606) %>% filter(n.trees < 5e3),
+  aes(
+    x = n.trees,
+    y = Accuracy,
+    color = as.character(interaction.depth),
+    linetype = as.character(shrinkage)
+  )
+) +
+geom_vline(xintercept = 204, size = 1.3, alpha = 0.15, color = red_pink) +
+geom_vline(xintercept = 606, size = 1.3, alpha = 0.3, color = red_pink) +
+geom_line(size = 0.4) +
+scale_y_continuous("Accuracy", labels = percent) +
+scale_x_continuous("Number of trees", labels = scales::comma) +
+scale_color_viridis_d("Tree depth", option = "magma", end = 0.85) +
+scale_linetype_manual("Shrinkage", values = c("longdash", "dotted", "solid")) +
+theme_minimal(base_size = 18, base_family = "Fira Sans Book")
+```
+
+---
+layout: false
+class: clear
+
+.b[Comparing boosting parameters]—and even more trees!
+
+```{r, plot-boost-param-and-even-more, echo = F}
+ggplot(
+  data = heart_boost$results %>% mutate(grp = paste(shrinkage, interaction.depth, sep = ", ")) %>% filter(n.trees %in% seq(1, 1e4, by = 25) | n.trees == 606),
+  aes(
+    x = n.trees,
+    y = Accuracy,
+    color = as.character(interaction.depth),
+    linetype = as.character(shrinkage)
+  )
+) +
+geom_vline(xintercept = 204, size = 1.3, alpha = 0.15, color = red_pink) +
+geom_vline(xintercept = 606, size = 1.3, alpha = 0.3, color = red_pink) +
+geom_line(size = 0.4) +
+scale_y_continuous("Accuracy", labels = percent) +
+scale_x_continuous("Number of trees", labels = scales::comma) +
 scale_color_viridis_d("Tree depth", option = "magma", end = 0.85) +
 scale_linetype_manual("Shrinkage", values = c("longdash", "dotted", "solid")) +
 theme_minimal(base_size = 18, base_family = "Fira Sans Book")
@@ -1819,7 +1871,7 @@ ggplot(
 ) +
 geom_line() +
 scale_y_continuous("Accuracy", labels = scales::percent) +
-scale_x_continuous("Number of trees") +
+scale_x_continuous("Number of trees", labels = scales::comma) +
 scale_color_manual(
   "[Method, Estimate]",
   values = c(red_pink, purple, turquoise, orange, slate)

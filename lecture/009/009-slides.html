@@ -4,10 +4,13 @@
     <title>Lecture .mono[009]</title>
     <meta charset="utf-8" />
     <meta name="author" content="Edward Rubin" />
-    <meta name="date" content="2021-02-25" />
+    <script src="009-slides_files/header-attrs-2.11/header-attrs.js"></script>
     <link href="009-slides_files/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="009-slides_files/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
     <link href="009-slides_files/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+    <link href="009-slides_files/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="009-slides_files/tile-view-0.2.6/tile-view.js"></script>
+    <script src="009-slides_files/xaringanExtra_fit-screen-0.2.6/fit-screen.js"></script>
     <link rel="stylesheet" href="my-css.css" type="text/css" />
   </head>
   <body>
@@ -17,7 +20,7 @@ class: center, middle, inverse, title-slide
 # Lecture .mono[009]
 ## Support vector machines
 ### Edward Rubin
-### 25 February 2021
+### Winter 2022
 
 ---
 
@@ -63,6 +66,7 @@ name: intro
 The .attn[support vector machine] generalizes a much simpler classifier—the .attn[maximal margin classifier].
 
 The .attn[maximal margin classifier] attempts to separate the .b[two classes] in our prediction space using .b[a single hyperplane].
+
 ---
 name: hyperplanes
 ## What's a hyperplane?
@@ -1132,13 +1136,13 @@ For a real example let's go back to the heart disease dataset.
 ```r
 # Load the dataset
 heart_df = read_csv("Heart.csv") %&gt;%
-  dplyr::rename(id = X1, HeartDisease = AHD) %&gt;%
-  janitor::clean_names()
+  dplyr::select(-1) %&gt;%
+  rename(HeartDisease = AHD) %&gt;%
+  clean_names()
 # Define the recipe w/ imputation, dummies, and normalization
 heart_recipe = recipe(heart_disease ~ ., data = heart_df) %&gt;% 
-  update_role(id, new_role = "id variable") %&gt;% 
-  step_medianimpute(all_predictors() &amp; all_numeric()) %&gt;% 
-  step_modeimpute(all_predictors() &amp; all_nominal()) %&gt;% 
+  step_impute_median(all_predictors() &amp; all_numeric()) %&gt;% 
+  step_impute_mode(all_predictors() &amp; all_nominal()) %&gt;% 
   step_dummy(all_predictors() &amp; all_nominal()) %&gt;% 
   step_normalize(all_predictors())
 # Define CV
