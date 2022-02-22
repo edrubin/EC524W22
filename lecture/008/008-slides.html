@@ -1274,6 +1274,29 @@ $$
 
 .hi-orange[Step 3:] Output the boosted model:
 `\(\mathop{\color{#6A5ACD}{\hat{f}}}(x) = \sum_{b} \lambda \mathop{\color{#e64173}{\hat{f^b}}}(x)\)`.
+
+---
+name: boost-expand
+layout: false
+class: clear
+
+.b[Boosted residuals: The expansion]
+
+.note[Recall:] Boosting trains 
+- .pink[successive models] `\(\color{#e64173}{\hat{f_{i}}}(y,x)\)`
+- on .orange[previous models' residuals], `\(\color{#FFA500}{r_{i-1}}\)` (shrunk by `\(\color{#6A5ACD}{\lambda}\)`)
+
+$$
+`\begin{align}
+  \color{#FFA500}{r_0} &amp;= y \\[1em]
+  \color{#FFA500}{r_1} &amp;= \color{#FFA500}{r_0} - \color{#6A5ACD}{\lambda} \color{#e64173}{\hat{f_{1}}}(\color{#FFA500}{r_0}, x) \\[0.35em]
+  &amp;= y - \color{#6A5ACD}{\lambda} \color{#e64173}{\hat{f_{1}}}(y, x) \\[1em]
+  \color{#FFA500}{r_2} &amp;= \color{#FFA500}{r_1} - \color{#6A5ACD}{\lambda} \color{#e64173}{\hat{f_{2}}}(\color{#FFA500}{r_1}, x) \\[0.35em]
+  &amp;= y - \color{#6A5ACD}{\lambda} \color{#e64173}{\hat{f_{1}}}(y, x) - \color{#6A5ACD}{\lambda} \color{#e64173}{\hat{f_{2}}}(y - \color{#6A5ACD}{\lambda} \color{#e64173}{\hat{f_{1}}}(y, x), x) \\[1em]
+  &amp;\cdots
+\end{align}`
+$$
+
 ---
 name: boost-r
 ## Boosting in R
@@ -25978,7 +26001,6 @@ Of course, there are a lot of other tree-based learning options:
 
 - [TabNet](https://arxiv.org/abs/1908.07442) ([R](https://github.com/mlverse/tabnet/))
 
-
 ---
 name: sources
 layout: false
@@ -25987,6 +26009,7 @@ layout: false
 These notes draw upon
 
 - [An Introduction to Statistical Learning](http://faculty.marshall.usc.edu/gareth-james/ISL/) (*ISL*)&lt;br&gt;James, Witten, Hastie, and Tibshirani
+
 ---
 # Table of contents
 
@@ -26025,6 +26048,7 @@ These notes draw upon
   - [Parameters](#boost-param)
   - [Algorithm](#boost-alg)
   - [In R](#boost-r)
+  - [Expanding residuals](#boost-expand)
 
 ]
 ]
