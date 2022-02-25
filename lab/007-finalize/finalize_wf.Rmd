@@ -1,0 +1,196 @@
+---
+title: "Predicting testing data using `tidymodels`"
+subtitle: "Ames housing data"
+author: "Andrew Dickinson"
+date: </br>`r format(Sys.time(), '%d %B %Y')`
+output:
+  html_document:
+    toc: yes
+    toc_depth: 5
+    number_sections: no
+    theme: flatly
+    highlight: tango
+    toc_float:
+      collapsed: yes
+      smooth_scroll: yes
+  pdf_document:
+    toc: no
+    toc_depth: '5'
+header-includes:
+- \usepackage{mathtools}
+- \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+- \usepackage{amssymb}
+---
+
+```{r}
+knitr::opts_chunk$set(warning = FALSE) ## Limit warnings
+knitr::opts_chunk$set(message = FALSE) ## Limit messages
+knitr::opts_chunk$set(echo    = TRUE)  ## Do not limit echo
+options(htmltools.dir.version = FALSE)
+# setup; load packages, data; set seed
+options(scipen = 999)
+library(pacman)
+p_load(tidyverse, modeldata, skimr, janitor, tidymodels, magrittr, data.table, here)
+set.seed(12345)
+source("~/Documents/scripts/colors/colors.R")
+```
+
+We have spent a lot of time over the last few weeks learning `tidymodels`. But there is one thing that we glazed over briefly that is super important for your final projects in this class.
+
+Once we cross validate, fit a model within a workflow, and pick the best parameters, how do we predict that model onto our __testing data__? This set of notes will show you how to do this last step mimicking the `project000` using housing data.
+
+# Setup
+
+Let's load the housing data (training and testing) from Ames, Iowa. Recall that sales prices are only reported in the training data set.
+
+
+```{r}
+# Load data ------------------------------------------------------------------------------
+# Training data
+train_dt = here('lab/001-cleaning/data', 'train.csv') %>% 
+  fread() %>% 
+  janitor::clean_names() %>% 
+  mutate(sqft = x1st_flr_sf + x2nd_flr_sf)
+
+# Testing data
+test_dt = here('lab/001-cleaning/data', 'test.csv') %>% 
+  fread() %>% 
+  janitor::clean_names() %>% 
+  mutate(sqft = x1st_flr_sf + x2nd_flr_sf)
+```
+
+Always a good idea to `skim` to check for missing vars + other info. Here I avoided using any 
+
+```{r}
+train_dt %>% skimr::skim()
+```
+
+Set up our cross validation splits
+
+```{r}
+# 5-fold CV on the training dataset 
+train_cv = train_dt %>% vfold_cv(v = 5)
+```
+
+# `tidymodel`ing
+
+## `recipe`
+
+I create a very simple recipe here with little for thought. Not really trying my hardest with the model formula. But I could easily start changing my predictors by altering my recipe.
+
+```{r, recipe}
+recipe = recipe(sale_price ~ id + 
+                             yr_sold + full_bath + year_built + lot_area + sqft +
+                             central_air + half_bath +
+                             pool_area + overall_qual + overall_cond + lot_area,
+                        data = train_dt) %>%
+  # step_rm(state, county, pop_pct_veteran, dir_2016) %>% 
+  update_role(id, new_role = "id var") %>% 
+  step_normalize(all_predictors() & all_numeric())
+  
+
+recipe
+```
+
+## `model`
+
+I'm going to give a random forest a shot for this prediction. Using 5 fold CV, I want to tune three parameters in my random forest: 
+
+- `min_n`: minimum number of data points in a node that are required for the node to be split further
+- `mtry`: number of predictors that will be randomly sampled at each split
+- `trees`: number of trees contained in the ensemble
+
+```{r, model}
+model = 
+  rand_forest(
+    mode = 'regression',
+    engine = 'ranger',
+    mtry = tune(),
+    trees = tune(),
+    min_n = tune()
+  )
+```
+
+## `workflow`
+
+Set my workflow with my model and recipe
+
+```{r, workflow}
+wf = 
+  workflow() %>%
+  add_model(model) %>%
+  add_recipe(recipe)
+```
+
+## `fit`
+
+Fit my model, tuning my parameters across several values. The measure of error I care about is the RMSE.
+
+```{r, fit, cache = TRUE}
+fit = wf %>% 
+  tune_grid(
+    train_cv,
+    grid = expand_grid(mtry = c(1,2,3,5,10),
+                      min_n = c(1,3,5,10, 25),
+                      trees = c(50, 100, 150, 300)),
+    metrics = metric_set(rmse)
+  )
+```
+
+After tuning, I plot my RMSE to check an see which how well my model did for each variation in my parameters
+
+```{r, fit-graph, fig.width = 12.5, fig.height=8, dpi=300}
+fit %>% 
+  collect_metrics(summarize = TRUE) %>% 
+  ggplot(aes(x = min_n, y = mean, group = factor(mtry), color = factor(mtry))) +
+  geom_line(size = 0.7, alpha = 0.6) +
+  geom_point(size = 2.5) +
+  facet_wrap(~trees, nrow = 1) +
+  labs(
+    title = "Random forest model performance",
+    subtitle = "Predicting housing prices",
+    caption = "connor is a nerd",
+    x = "Min data points per node",
+    y = 'RMSE',
+    color = 'Number of predictors'
+  ) +
+  hrbrthemes::theme_ipsum() +
+  scale_color_manual(values = c(grant_pal_1, grant_pal_3, grant_pal_5, 
+                                grant_pal_6, grant_pal_9)) +
+  scale_x_continuous(breaks = c(1, 3, 5, 10, 25)) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_blank(),
+    legend.position = 'bottom'
+  )
+```
+
+## `finalize_workflow`
+
+Now I want to finalize my workflow and select my best model parameters. This will output the model I want to use to predict housing prices in the testing data.
+```{r, finalize}
+final_rf = 
+  wf %>% 
+  finalize_workflow(select_best(fit, metric = "rmse"))
+```
+
+The following code chunk actually fits that model.
+
+```{r, final-fit}
+# Fitting our final workflow
+final = final_rf %>% fit(data = train_dt)
+# Examine the final workflow
+final
+```
+
+# `predict`
+
+Using the finalized workflow, I now predict housing prices in the testing data set using the familiar `predict` function. The result is a vector of $y^{hat}$s that my model would predict the sales price of each house.
+
+```{r, predict}
+# Predict onto the test data
+yhat = final %>% predict(new_data = test_dt)
+# Check out predictions
+yhat %>% head()
+```
+

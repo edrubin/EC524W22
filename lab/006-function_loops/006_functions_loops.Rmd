@@ -193,12 +193,21 @@ __Task:__
 
 (i.) Load the `election_2016.csv` data into memory
 
-(ii.) From part 1, create a function that automates the subparts 03 and 04--outputing a `rmse` for 3 different models. The arguments of the function should include `function(data)`
+(ii.) Create a function that:
 
-(iii.) Now make the function more general by allowing it to flexibly change the `lm` formula. Create a second argument, `function(data, formula)`, where formula is the model you want the function to use.
+- assigns each data point to training and validation in an 80-20 split (hint: `sample_frac` is useful here)
+- fits a simple ols model that you can specify in an argument of the custom function
+- `predict` onto the validation set
+- collects the `rmse` in a tibble/data.frame
 
-(iv.) Write a loop over all three formulas, returning `rmse` for each model. 
+The functional arguments should be `function(data, model)`
 
-(v.) Now let's generalize your function to add cross validation. Add a third argument, `function(data, formula, v)`, where `v` is the group you want to omit as the validation group.
+(iv.) Write a loop over three formulas, returning `rmse` for each model using this custom function.
+
+- hint: create a list with three formulas to loop over
+
+(v.) Now let's generalize your function to add cross validation. Use the `sample_int` function to split the data into 5 groups. Add a third argument, `function(data, formula, v)`, where `v` is the group you want to omit as the validation group.
+
+Test it out with different values of `v` and make sure it runs and returns a RMSE
  
-(vi.) Now write a nested (double) loop that loops over (1) each model (2) `v`. Your output should return an `rmse` for each combination of `formula` and `v`
+(vi.) Now write a nested (double) loop that loops over (1) each model (2) each `v`. Your output should return an `rmse` for each combination of `formula` and `v`
