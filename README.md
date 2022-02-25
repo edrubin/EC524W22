@@ -260,9 +260,9 @@ Housing data [download](https://github.com/edrubin/EC524W22/raw/master/lab/001-c
 1. Running a Ridge, Lasso or Elasticnet logistic regression in `tidymodels`.
 2. [A short lesson in writing functions and loops in R)](https://raw.githack.com/edrubin/EC524W22/master/lab/006-function_loops/006_functions_loops.html)
 
-[**007 - Finalizing a workflow in `tidymodels`: Example using a random forest**](https://raw.githack.com/edrubin/master/lab/007-finalize/finalize_wf.html)
+[**007 - Finalizing a workflow in `tidymodels`: Example using a random forest**](https://raw.githack.com/edrubin/EC524W22/master/lab/007-finalize/finalize_wf.html)
 
-1. [Finalizing a workflow in `tidymodels`: Example using a random forest](https://raw.githack.com/edrubin/master/lab/007-finalize/finalize_wf.html)
+1. [Finalizing a workflow in `tidymodels`: Example using a random forest](https://raw.githack.com/edrubin/EC524W22/master/lab/007-finalize/finalize_wf.html)
 2. [A short lesson in writing functions and loops in R (continued)](https://raw.githack.com/edrubin/EC524W22/master/lab/006-function_loops/006_functions_loops.html)
 
 
