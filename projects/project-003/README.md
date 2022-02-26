@@ -1,4 +1,4 @@
-# Nonlinear predctors (trees)
+# Nonlinear predictors (trees)
 
 Let's return to the 2016 election one more time. (It's nice to be able to compare performance across projects.)
 
