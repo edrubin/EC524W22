@@ -91,10 +91,11 @@ Submit a short evaluation of whether you and your group-member equally distribut
 | 06 | Aidan Bergsman | Campbell Miller |  | Rainfall |
 | 07 | Tracy Bishop | Luke Coury |  | Labor-force participation (OR) |
 | 08 | Nathan Bracken | Micah Klein |  | Stationarity |
-| 09 | Connor Burton |  |  | Green energy investment |
-| 10 | Hans Elliott | Santiago Giordano |  | Late arrivals |
-| 11 | Hannah Grubbs | Purushothaman Padmanabhan | Jay Schmidt | Winter Olympics medals |
-| 12 | Rhodes Kikrpatrick | Ben Noon |  | Poverty |
-| 13 | Jeremy Patak |  |  | NBA wins |
-| 14 | Eliana Squire | Natalie Walker |  | Vaccination rates |
-| 15 | Zexiong Zhang | | | NBA championship |
+| 09 | Kyle Brewster | | | Policing |
+| 10 | Connor Burton |  |  | Green energy investment |
+| 11 | Hans Elliott | Santiago Giordano |  | Late arrivals |
+| 12 | Hannah Grubbs | Purushothaman Padmanabhan | Jay Schmidt | Winter Olympics medals |
+| 13 | Rhodes Kikrpatrick | Ben Noon |  | Poverty |
+| 14 | Jeremy Patak |  |  | NBA wins |
+| 15 | Eliana Squire | Natalie Walker |  | Vaccination rates |
+| 16 | Zexiong Zhang | | | NBA championship |

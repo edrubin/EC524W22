@@ -194,7 +194,7 @@ Planned projects
 
 **002** [Penalized regression, logistic regression, and classification](https://github.com/edrubin/EC524W22/tree/master/projects/project-002)
 
-**003** Nonlinear predictors
+**003** [Nonlinear predictors](https://github.com/edrubin/EC524W22/tree/master/projects/project-003)
 
 **004** MNIST image classification
 
