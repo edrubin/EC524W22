@@ -97,3 +97,4 @@ Submit a short evaluation of whether you and your group-member equally distribut
 | 12 | Rhodes Kikrpatrick | Ben Noon |  | Poverty |
 | 13 | Jeremy Patak |  |  | NBA wins |
 | 14 | Eliana Squire | Natalie Walker |  | Vaccination rates |
+| 15 | Zexiong Zhang | | | NBA championship |

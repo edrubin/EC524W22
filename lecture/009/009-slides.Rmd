@@ -2399,7 +2399,7 @@ layout: false
 
 These notes draw upon
 
-- [An Introduction to Statistical Learning](http://faculty.marshall.usc.edu/gareth-james/ISL/) (*ISL*)<br>James, Witten, Hastie, and Tibshirani
+- [An Introduction to Statistical Learning](https://www.statlearning.com) (*ISL*)<br>James, Witten, Hastie, and Tibshirani
 ---
 # Table of contents
 
