@@ -95,7 +95,8 @@ Submit a short evaluation of whether you and your group-member equally distribut
 | 10 | Connor Burton |  |  | Green energy investment |
 | 11 | Hans Elliott | Santiago Giordano |  | Late arrivals |
 | 12 | Hannah Grubbs | Purushothaman Padmanabhan | Jay Schmidt | Winter Olympics medals |
-| 13 | Rhodes Kikrpatrick | Ben Noon |  | Poverty |
-| 14 | Jeremy Patak |  |  | NBA wins |
-| 15 | Eliana Squire | Natalie Walker |  | Vaccination rates |
-| 16 | Zexiong Zhang | | | NBA championship |
+| 13 | Matt Kuchin | Tim Messenger | | Fraud and/or restatements |
+| 14 | Rhodes Kirkpatrick | Ben Noon |  | Poverty |
+| 15 | Jeremy Patak |  |  | NBA wins |
+| 16 | Eliana Squire | Natalie Walker |  | Vaccination rates |
+| 17 | Zexiong Zhang | | | NBA championship |
