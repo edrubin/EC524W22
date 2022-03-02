@@ -9,6 +9,11 @@ projects/past/*
 exam/data/yelp_academic_dataset_business.json
 exam/submissions
 
+# Data
+projects/project-004/digits/train.csv
+projects/project-004/digits/test.csv
+projects/project-004/digits/sample_submission.csv
+
 # History files
 .Rhistory
 *.Rhistory

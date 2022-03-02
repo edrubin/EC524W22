@@ -196,7 +196,7 @@ Planned projects
 
 **003** [Nonlinear predictors](https://github.com/edrubin/EC524W22/tree/master/projects/project-003)
 
-**004** MNIST image classification
+**004** [Image/multi-class classification (MNIST)](https://github.com/edrubin/EC524W22/tree/master/projects/project-004)
 
 ## Class project
 
