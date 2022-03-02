@@ -85,7 +85,7 @@ simple_recipe =
   step_mutate(label = as.factor(label))
 ```
 
-Of course there’s always something more you could try… here’s an example of [PCA](https://setosa.io/ev/principal-component-analysis/).
+Of course there’s always something more you could try… here’s an example of [PCA](https://setosa.io/ev/principal-component-analysis/) (plus another [resource](https://www.nature.com/articles/nmeth.4346)).
 
 ```{r ex-pca}
 # If you wanted to go with PCA...
@@ -303,10 +303,10 @@ The classic approach here is to look at the "total within-cluster variation" as 
 
 In our situation, we are actually interested in model accuracy. So let's check out the accuracy of clusters' predictions (in-sample, for now) as we increase the number of clusters.
 
-```{r find-k}
+```{r find-k, cache = TRUE}
 find_k = mclapply(
-  mc.cores = 8,
-  X = 1:30,
+  mc.cores = parallel::detectCores(),
+  X = 1:40,
   FUN = function(k) {
     # Try 'k' clusters
     k_centers = KMeans_arma(
