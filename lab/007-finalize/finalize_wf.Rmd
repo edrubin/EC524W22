@@ -149,7 +149,7 @@ fit %>%
   labs(
     title = "Random forest model performance",
     subtitle = "Predicting housing prices",
-    caption = "connor is a nerd",
+    caption = "",
     x = "Min data points per node",
     y = 'RMSE',
     color = 'Number of predictors'
@@ -192,5 +192,7 @@ Using the finalized workflow, I now predict housing prices in the testing data s
 yhat = final %>% predict(new_data = test_dt)
 # Check out predictions
 yhat %>% head()
+
+test_dt$yhat <- yhat
 ```
 
