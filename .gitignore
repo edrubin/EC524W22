@@ -10,9 +10,9 @@ exam/data/yelp_academic_dataset_business.json
 exam/submissions
 
 # Data
-lecture/010/digits/train.csv
-lecture/010/digits/test.csv
-lecture/010/digits/sample_submission.csv
+lecture/010/train.csv
+lecture/010/test.csv
+lecture/010/sample_submission.csv
 
 # History files
 .Rhistory
