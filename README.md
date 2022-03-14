@@ -179,14 +179,14 @@ Welcome to Economics 524 (424): Prediction and machine-learning in econometrics,
 
 - *ISL* Ch9
 
-[**010 - Dimensionality reduction and unsupervised learning**](https://raw.githack.com/edrubin/EC524W22/master/lecture/010/digits.nb.html)
+[**010 - Dimensionality reduction and unsupervised learning**](https://raw.githack.com/edrubin/EC524W22/master/lecture/010/010-notebook.html)
 
 0. MNIST dataset (machines with vision)
 1. *K*-means clustering
 2. Principal component analysis (PCA)
 3. UMAP
 
-**Formats** [.html](https://raw.githack.com/edrubin/EC524W22/master/lecture/010/010-notebook.html) | [.pdf](https://github.com/edrubin/EC524W21/blob/master/lecture/010/010-notebook.pdf) | [.Rmd](https://github.com/edrubin/EC524W22/blob/master/lecture/010/010-notebook.Rmd)
+**Formats** [.html](https://raw.githack.com/edrubin/EC524W22/master/lecture/010/010-notebook.html) | [.pdf](https://github.com/edrubin/EC524W22/blob/master/lecture/010/010-notebook.pdf) | [.Rmd](https://github.com/edrubin/EC524W22/blob/master/lecture/010/010-notebook.Rmd)
 
 ## Projects
 
