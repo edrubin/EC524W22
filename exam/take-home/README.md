@@ -22,7 +22,7 @@ The [dataset](https://github.com/edrubin/EC524W22/blob/master/exam/take-home/fin
 
 ## Your goal 
 
-Your goal for this exam is for you to predict this new `undervalued` variable using what you've learned in this class. The specifics are below, but you should imagine that you know whether a competing real estate firm tended to undervalue properties. You now want to figure out which properties you can "steal" from your competitor due to their poor predictions.
+Your goal for this exam is for you to predict this new `undervalued` variable using what you've learned in this class. The specifics are below, but you should imagine that you know whether a competing real estate firm tended to undervalue properties. You now want to figure out which properties you can "steal" from your competitor (me!) due to their poor predictions.
 
 ## Important data notes
 
