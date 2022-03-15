@@ -18,7 +18,7 @@ We're going back to where it all started (for our class): [Kaggle's house-price 
 
 However, there's a twist: I already trained a **linear** model (using lasso) and then generated predictions from that lasso model. Using the real house prices and my lasso-based predictions, I then created a new binary variable called `undervalued`. This `undervalued` variable is defined as whether my prediction *undervalued* the house (meaning it predicted a price that was lower than the actual price). 
 
-The dataset contains this new `undervalued` variable and all of the original .
+The [dataset](https://github.com/edrubin/EC524W22/blob/master/exam/take-home/final-data.csv) contains this new `undervalued` variable and all of the original .
 
 ## Your goal 
 
@@ -32,11 +32,11 @@ Your goal for this exam is for you to predict this new `undervalued` variable us
 
 - *Related:* For some variables, a value of `NA` should not be imputed. For example, pool quality is `NA` for houses without pools. You might want to just replace those `NA`s with `'No pool'` rather than imputing.
 
-- Variable descriptions are available in `data-description.txt`.
+- Variable descriptions are available in [`data-description.txt`](https://github.com/edrubin/EC524W22/blob/master/exam/take-home/data-description.txt).
 
-## Questions
+## Questions/tasks
 
-**01** (5 points) Briefly explain why would being able to predict whether my model underpredicted a house's price mean that your model "beats" my model?
+**01** (5 points) Briefly explain why being able to predict whether my model underpredicted a house's price means that your model "beats" my model.
 
 **02** (30 points) Use two different models to predict `undervalued`. 
 
